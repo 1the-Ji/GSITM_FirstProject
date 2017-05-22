@@ -1,0 +1,77 @@
+package com.gsitm.provisioning;
+
+import java.io.IOException;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.gsitm.dao.ProvisioningDAO;
+import com.gsitm.dto.EmployeesDTO;
+
+@WebServlet("/provisioning")
+public class ProvisioningAction extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+		ProvisioningDAO pDao = new ProvisioningDAO();
+		//기존 회의실 관리자 정보를 검색
+		EmployeesDTO oldConfAdmin = pDao.selectConferenceAdmin();
+		//기존 교육실 관리자 정보를 검색
+		EmployeesDTO oldEduAdmin = pDao.selectEducationAdmin();
+
+		//기존 회의실 관리자 정보
+		request.setAttribute("oldConfAdmin", oldConfAdmin);
+		//기존 교육실 관리자 정보
+		request.setAttribute("oldEduAdmin", oldEduAdmin);
+
+		RequestDispatcher dispatcher = request.getRequestDispatcher("./view/provisioning/provisioning.jsp");
+		dispatcher.forward(request, response);
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+		request.setCharacterEncoding("utf-8");
+		response.setContentType("text/html; charset=utf-8");
+
+		System.out.println("새로 지정한 회의실 관리자 newConfAdminEmpId : " + request.getParameter("newConfAdminEmpId"));
+		System.out.println("새로 지정한 교육실 관리자 newEduAdminEmpId : " + request.getParameter("newEduAdminEmpId"));
+
+		System.out.println("기존 회의실 관리자 아이디 oldConfAdminEmpId : " + request.getParameter("oldConfAdminEmpId"));
+		System.out.println("기존 교육실 관리자 아이디 oldEduAdminEmpId : " + request.getParameter("oldEduAdminEmpId"));
+
+		String oldConfAdminEmpId = request.getParameter("oldConfAdminEmpId"); //기존 회의실 관리자 아이디
+		String oldEduAdminEmpId = request.getParameter("oldEduAdminEmpId");   //기존 교육실 관리자 아이디
+
+		String newConfAdminEmpId = request.getParameter("newConfAdminEmpId"); //새로 지정한 회의실 관리자 아이디
+		String newEduAdminEmpId = request.getParameter("newEduAdminEmpId");   //새로 지정한 교육실 관리자 아이디
+
+		ProvisioningDAO pDao = new ProvisioningDAO();
+		//새로 지정한 사원에게 회의실 관리자 권한을 부여
+		pDao.updateNewConferenceAdmin(newConfAdminEmpId);
+		//새로 지정한 사원에게 교육실 관리자 권한을 부여
+		pDao.updateNewEducationAdmin(newEduAdminEmpId);
+
+		//기존의 회의실 관리자의 권한을 일반 사용자로 변경
+		pDao.updateOldConferenceAdmin(oldConfAdminEmpId);
+		//기존의 교육실 관리자의 권한을 일반 사용자로 변경
+		pDao.updateOldEducationAdmin(oldEduAdminEmpId);
+
+		//기존 회의실 관리자 정보를 검색
+		EmployeesDTO curConferenceAdmin = pDao.selectConferenceAdmin();
+		//기존 교육실 관리자 정보를 검색
+		EmployeesDTO curEducationAdmin = pDao.selectEducationAdmin();
+
+		//새로 지정한 회의실 관리자 정보
+		request.setAttribute("oldConfAdmin", curConferenceAdmin);
+		//새로 지정한 교육실 관리자 정보
+		request.setAttribute("oldEduAdmin", curEducationAdmin);
+
+		RequestDispatcher dispatcher = request.getRequestDispatcher("./view/provisioning/provisioning.jsp");
+		dispatcher.forward(request, response);
+	}
+}

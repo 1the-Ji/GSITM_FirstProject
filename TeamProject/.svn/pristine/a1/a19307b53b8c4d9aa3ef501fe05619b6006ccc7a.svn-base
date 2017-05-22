@@ -1,0 +1,49 @@
+package com.gsitm.mail;
+
+/**
+ * @프로그램명 : MailSendTest.java
+ * @작성일    : 2017. 4. 25.
+ * @작성자    : 김태형
+ * @기능     : 메일 전송 테스트 클래스 - 회의실 예약 확인메일 발송 예제
+ * @버전     : 1.0
+ */
+public class ReservationMailSendTest {
+	public static void main(String[] ar){
+		
+		//발송 메일양식 종류 (예약확인 변경확인 취소확인 결재승인 사용승인 결재요청 승인요청 비용청구)
+		(new MailSender()).send("it0907@gsitm.com", "사용승인", 99);
+/*
+		StringBuilder query = new StringBuilder();
+		query.append("type=예약확인"); //메일타입 = 예약확인메일
+		query.append("&regId=99"); //예약id
+		
+		String body = "";
+		
+		try {
+			
+			body = HttpReader.getHtmlString("http://localhost:8181/TeamProject/mailformgen", query.toString());
+
+			//에러 페이지일 경우 메일 보내지 않음
+			if( 0 <= body.indexOf("Error") ){
+				System.out.println("메일 전송 실패 - 폼 작성 에러");
+				return;
+			}
+			
+			//debug
+			//System.out.println(body);
+			
+			//발신자 정보 설정
+			MailManager mn = new MailManager("김태형", "it0907@gsitm.com", new String(Base64.getDecoder().decode("MTg5OTkxNQ==")));
+			
+			//수신자로 전송
+			String result = mn.sendMail("it0907@gsitm.com", "회의실 예약 안내 테스트 메일입니다.", body);
+			
+			//debug
+			System.out.println("메일 전송 결과 - " + result);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		*/
+	}
+}

@@ -1,0 +1,53 @@
+package com.gsitm.mail;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Map;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+/**
+ * @프로그램명 : MailFormGeneratorServlet.java
+ * @작성일    : 2017. 4. 24.
+ * @작성자    : 김태형
+ * @기능     : 사용자에게 발송되는 이메일 본문 내용 양식으로부터 내용을 채워 html 응답.
+ * @버전     : 1.0
+ */
+@WebServlet("/mailFormCen")
+public class MailFormGeneratorAction extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		doPost(request, response);
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+		//인코딩 설정
+		response.setContentType("text/html;charset=UTF-8");
+		request.setCharacterEncoding("UTF-8");
+
+		PrintWriter out = response.getWriter();
+
+		//type == 회의실 예약 안내메일일 경우
+		if( "confirm".equals(request.getParameter("type")) ){
+
+			//파라미터값들을 속성으로 바인딩하여 설정
+			Map<String, String[]> paramMap = request.getParameterMap();
+			for(String key: paramMap.keySet()){
+				request.setAttribute(key, paramMap.get(key)[0]);
+			}
+			
+			//양식 jsp로 포워드
+			request.getRequestDispatcher("/WEB-INF/template/reservConfirmMail.jsp").forward(request, response);
+		}
+		else{
+			//지정되지 않은 형식일 경우 "Error" 출력
+			out.println("<h1>Error: No Parameter</h1>");
+			return;
+		}
+	}
+}

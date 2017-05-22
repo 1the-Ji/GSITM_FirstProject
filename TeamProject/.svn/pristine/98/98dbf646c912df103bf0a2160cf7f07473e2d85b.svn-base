@@ -1,0 +1,79 @@
+<%--
+	author  : IT1702015
+	since   : 2017. 4. 20.
+	version : 1.0
+	subject : 
+	description :
+--%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+ 
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+html{box-sizing:border-box}*,*:before,*:after{box-sizing:inherit;}
+footer,header{display:block}
+a{background-color:transparent;}
+a:active,a:hover{outline-width:0}
+html,body{font-family:Verdana,sans-serif;font-size:15px;line-height:1.5;}html{overflow-x:hidden}
+a{color:inherit}
+.w3-button{border:none;display:inline-block;outline:0;padding:8px 16px;vertical-align:middle;overflow:hidden;text-decoration:none;color:inherit;background-color:inherit;text-align:center;cursor:pointer;white-space:nowrap}
+.w3-bar-block{width:100%}
+.w3-bar{width:100%;overflow:hidden}.w3-center .w3-bar{display:inline-block;width:auto}
+.w3-bar .w3-bar-item{padding:8px 16px;float:left;width:auto;border:none;outline:none;display:block}
+.w3-bar .w3-button{white-space:normal}
+.w3-bar-block .w3-bar-item{width:100%;display:block;padding:8px 16px;text-align:left;border:none;outline:none;white-space:normal}
+.w3-bar:before,.w3-bar:after{content:"";display:table;clear:both}
+.w3-hide{display:none!important}.w3-show{display:block!important}
+@media (max-width:600px){
+.w3-hide-small{display:none!important}
+.w3-button{width:100%}}
+@media (max-width:992px) and (min-width:601px){.w3-hide-medium{display:none!important}}
+.w3-top{position:fixed;width:100%;z-index:1;top:0;}
+.w3-card-2{box-shadow:0 2px 5px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12)}
+.w3-padding-large{padding:12px 24px!important}
+.w3-padding-large{padding:12px 24px!important}
+.w3-right{float:right!important}
+.w3-button:hover{color:#000!important;background-color:#ccc!important}
+.w3-black,.w3-hover-black:hover{color:#fff!important;background-color:#000!important}
+
+
+</style>
+<meta charset="UTF-8">
+<title>JSP</title>
+</head>
+<body>
+<!-- Navbar -->	
+<div class="w3-top">
+  <div class="w3-bar w3-black w3-card-2">
+   <a class="w3-bar-item w3-button w3-padding-large w3-hide-medium w3-hide-large w3-right" href="javascript:void(0)" onclick="myFunction()" title="Toggle Navigation Menu"><i class="fa fa-bars"></i></a>
+    <a href="#" class="w3-bar-item w3-button w3-padding-large">홈</a>
+    <a href="#" class="w3-bar-item w3-button w3-padding-large w3-hide-small">예약안내</a>
+    <a href="#" class="w3-bar-item w3-button w3-padding-large w3-hide-small">회의실예약</a>
+    <a href="#" class="w3-bar-item w3-button w3-padding-large w3-hide-small">교육실예약</a>
+    <a href="javascript:void(0)" class="w3-padding-large w3-hover-red w3-hide-small w3-right"><i class="fa fa-search"></i></a>
+  </div>
+</div>
+
+<!-- Navbar on small screens -->
+<div id="navDemo" class="w3-bar-block w3-black w3-hide w3-hide-large w3-hide-medium w3-top" style="margin-top:46px">
+  <a href="#" class="w3-bar-item w3-button w3-padding-large">예약안내</a>
+  <a href="#" class="w3-bar-item w3-button w3-padding-large">회의실예약</a>
+  <a href="#" class="w3-bar-item w3-button w3-padding-large">교육실예약</a>
+</div>
+
+
+<script>
+function myFunction() {
+    var x = document.getElementById("navDemo");
+    if (x.className.indexOf("w3-show") == -1) {
+        x.className += " w3-show";
+    } else { 
+        x.className = x.className.replace(" w3-show", "");
+    }
+}
+</script>
+
+
+</body>
+</html>

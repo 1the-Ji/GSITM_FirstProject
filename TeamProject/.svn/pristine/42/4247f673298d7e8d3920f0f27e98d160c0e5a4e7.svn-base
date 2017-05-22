@@ -1,0 +1,82 @@
+package com.gsitm.servlet.system;
+
+import java.io.IOException;
+import java.util.List;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import com.gsitm.dao.RoomDAO;
+
+/**
+ * Servlet implementation class ConferenceManageAction
+ */
+@WebServlet("/conference/manageaction")
+public class ConferenceManageAction extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		System.out.println("conference/manageaction : get()");
+
+		String pageNo = request.getParameter("pageNo");
+		HttpSession session = request.getSession();
+			int intPageNo = 1;
+			if (pageNo == null) {
+				pageNo = (String) session.getAttribute("pageNo");
+				if (pageNo != null) {
+					intPageNo = Integer.parseInt(pageNo);
+				}
+			} else {
+				intPageNo = Integer.parseInt(pageNo);
+			}
+			session.setAttribute("pageNo", String.valueOf(intPageNo));//세션에 현재 저장된 페이지 전달
+
+
+			int rowsPerPage = 10;
+			int pagesPerGroup = 5;
+
+			int totalBoardNo = (new RoomDAO()).getCount();//전체 게시물 수 구하기
+
+			int totalPageNo = (totalBoardNo/rowsPerPage)+((totalBoardNo%rowsPerPage!=0)?1:0);//전체 페이지수
+			int totalGroupNo = (totalPageNo/pagesPerGroup)+((totalPageNo%pagesPerGroup!=0)?1:0);//전체 그룹수
+
+			int groupNo = (intPageNo-1)/pagesPerGroup + 1;//현재 그룹의 번호
+			int startPageNo = (groupNo-1)*pagesPerGroup + 1;//그룹의 첫번째 번호 구하기
+			int endPageNo = startPageNo + pagesPerGroup - 1;//그룹의 마지막 번호 구하기
+
+			if (groupNo == totalGroupNo) {
+				endPageNo = totalPageNo;
+			}
+
+			List<Object> roomList = (new RoomDAO()).selectAllRoom(intPageNo, rowsPerPage,request);
+			System.out.println("roomList" + roomList);
+			session.setAttribute("Room", roomList);
+
+			session.setAttribute("pageNo",intPageNo);
+			session.setAttribute("rowsPerPage",rowsPerPage);
+			session.setAttribute("pagesPerGroup",pagesPerGroup);
+			session.setAttribute("totalBoardNo",totalBoardNo);
+			session.setAttribute("totalPageNo",totalPageNo);
+			session.setAttribute("totalGroupNo",totalGroupNo);
+			session.setAttribute("groupNo",groupNo);
+			session.setAttribute("startPageNo",startPageNo);
+			session.setAttribute("endPageNo",endPageNo);
+
+			response.setContentType("text/xml;charset=UTF-8");
+
+			//세션에 저장한 값을 conductArrayInfo에 값을 넘김
+			response.sendRedirect("../view/system/conferenceManage.jsp");
+
+	}
+
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+	}
+
+}

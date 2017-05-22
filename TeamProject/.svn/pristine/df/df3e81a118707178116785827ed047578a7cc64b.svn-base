@@ -1,0 +1,205 @@
+<%--
+	author  : 지승훈
+	since   : 2017. 5. 5.
+	version : 1.0
+	subject : 시스템관리자가 회의실을 관리 하기위한 JSP
+	description :
+--%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>JSP</title>
+	   <style>
+			h, td, tr, input, textarea, select, form{
+				font-family:고딕;
+				font-size:1em;
+				border-radius:5px;
+			}
+			table, FORM{
+				border-spacing:15px;
+			}
+			table,table th, table td{
+				border-collapse:collapse;
+				border:1px solid #B1B1B1;
+			}
+			table{
+				margin:0 auto;
+			}
+			table table table{
+				width: 600px;
+			}
+			.fixtureList, .snackList{
+				width:  620px;
+				height: 100px;
+				position: relative;
+				overflow :scroll;
+			}
+			.updateCheck{
+				display: table;
+				margin: 0 auto;
+			}
+			.updateCheck input{
+				margin: 0 5px;
+			}
+	  </style>
+	</head>
+	<body>
+		<jsp:include page="/view/common/administratorHeader.jsp"></jsp:include>
+		 <h2> 교육실 수정</h2>
+		 <hr/>
+		  <form method="post" enctype="multipart/form-data" action="../education/updateaction">
+			 <table>
+			  <tr>
+				   <td text-align="center">교육실명(${room.roomId}) <input type="hidden" name="roomId" value='${room.roomId}'/> </td>
+				   <td><input type = "text" name="roomName" value="${room.roomName}"/></td>
+			  </tr>
+			  <tr>
+			  		<td> 교육실 위치 </td>
+			   	<td><input type = "text" name="position" value="${room.position}"></td>
+			  </tr>
+			  <tr>
+			   	<td> 건물명 </td>
+			   	<td><input type = "text" name="buildName" value="${room.buildName}"/></td>
+			  </tr>
+			  <tr>
+			   	<td> 교육실 크기 </td>
+			   	<td><input type = "text" name="roomSize" value="${room.roomSize}"/></td>
+			  </tr>
+			  <tr>
+			   	<td> 교육실 수용인원 </td>
+			   	<td><input type = "text" name="numberOfEmp" value="${room.numberOfEmp}"/></td>
+			  </tr>
+			  <tr>
+			   	<td> 비치물품 </td>
+			   	<td>
+						<table class="fixture">
+							<tr>
+								<td>
+									비치물품명: <input type="text" id="fixtureName" name="name"/>
+									요금: <input type="text" id="fixturePay" name="pay"/>
+									<input type="button" id="regFixture" value="추가"> <input type="button" id="delFixture" value="삭제">
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<div class="fixtureList">
+											<table>
+												<tr>
+													<td>비치물품</td>
+													<td>이용요금</td>
+												</tr>
+											  	<c:forEach var="fixture" items="${fixture}">
+												<tr>
+													<td>${fixture.name}<input type="hidden" name="fixtureName" value="${fixture.name}"></td>
+													<td>${fixture.pay}원<input type="hidden" name="fixturePay" value="${fixture.pay}"></td>
+												</tr>
+												</c:forEach>
+											</table>
+									</div>
+								</td>
+							</tr>
+						</table>
+			   	</td>
+			  </tr>
+			  <tr>
+			   	<td> 간식 </td>
+			   	<td>
+						<table class="snack">
+							<tr>
+								<td>
+									간식명: <input type="text" id="snackName" name="name"/>
+									요금: <input type="text" id="snackPay" name="pay"/>
+									<input type="button" id="regsnack" value="추가"> <input type="button" id="delsnack" value="삭제">
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<div class="snackList">
+										<table>
+											<tr>
+												<th>간식</th>
+												<th>요금</th>
+											</tr>
+											<c:forEach var="snack" items="${snack}">
+												<tr>
+													<td>${snack.name}<input type="hidden" name="snackName" value="${snack.name}"></td>
+													<td>${snack.pay}원<input type="hidden" name="snackPay" value="${snack.pay}"></td>
+												</tr>
+											</c:forEach>
+										</table>
+									</div>
+								</td>
+							</tr>
+						</table>
+			   	</td>
+			  </tr>
+			  <tr>
+				   <td> N/W 사용여부 </td>
+				   <td>
+				   	<input type = "radio" name = "netFlag" checked> 남자
+	   				<input type = "radio" name = "netFlag"> 여자
+				   </td>
+			  </tr>
+			  <tr>
+				   <td> 사용요금 </td>
+				   <td>
+			    		<input type = "text" name = "fee" value="${room.fee}"/> 원
+			  		</td>
+			  </tr>
+			  <tr>
+			   	<td> 교육실 이미지 </td>
+			   	<td>
+			   		<input type="file" name="uploadFile1"><br>
+			   		<input type="file" name="uploadFile2"><br>
+			   		<input type="file" name="uploadFile3"><br>
+			   	</td>
+			  </tr>
+			</table>
+			<div class="updateCheck">
+				<input type = "submit" value = "수정하기"/>
+				<input type = "reset" value = "다시 입력"/>
+			</div>
+		</form>
+		<br/>
+
+		<jsp:include page="/view/common/footer.jsp"></jsp:include>
+		<script>
+			$(document).ready(function(){
+				$("#regFixture").on("click",function(){
+					var fixtureName = $(".fixture #fixtureName").val();
+					var fixturePay = $(".fixture #fixturePay").val();
+					var tag = "<tr>";
+						 tag += 	"<td>" + fixtureName + "<input type='hidden' name='fixtureName' value='" + fixtureName + "'></td>";
+						 tag +=  "<td>" + fixturePay + "원<input type='hidden' name='fixturePay' value='" + fixturePay + "'></td>";
+						 tag +="</tr>";
+					$("div.fixtureList table").append(tag);
+				});
+
+				$("#regsnack").on("click",function(){
+					var snackName = $(".snack #snackName").val();
+					var snackPay = $(".snack #snackPay").val();
+					var tag = "<tr>";
+						 tag += 	"<td>" + snackName+ "<input type='hidden' name='snackName' value='" + snackName + "'></td>";
+						 tag +=  "<td>" + snackPay + "원<input type='hidden' name='snackPay' value='" + snackPay + "'></td>";
+						 tag +="</tr>";
+					$("div.snackList table").append(tag);
+				});
+			});
+
+			function showFile(){
+				var sf = document.getElementById("file").files;
+				var fileAr = new Array();
+				for(var i = 0;i<sf.length;i++){
+					var file = sf[i];
+					fileAr.push("namePhoto" + i + "=" + file.name );
+				}
+				var namePhotos = fileAr.join("&");
+				console.log(namePhotos);
+				//location.href= "../../conference/registerAction?" + namePhotos;
+			}
+		</script>
+	</body>
+</html>

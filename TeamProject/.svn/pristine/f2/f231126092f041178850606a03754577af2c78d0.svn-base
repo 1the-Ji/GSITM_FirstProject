@@ -1,0 +1,59 @@
+package com.gsitm.mail;
+
+import java.util.Base64;
+
+/**
+ * @프로그램명 : MailSendTest.java
+ * @작성일    : 2017. 4. 25.
+ * @작성자    : 김태형
+ * @기능     : 메일 전송 테스트 클래스 - 회의실 예약 확인메일 발송 예제
+ * @버전     : 1.0
+ */
+public class ReservationMailSendTest {
+	public static void main(String[] ar){
+
+		StringBuilder query = new StringBuilder();
+		query.append("type=confirm"); //메일타입 = 예약확인메일
+		query.append("&name=테스트"); //이름
+		query.append("&location=재동 본사");
+		query.append("&room=1회의실");
+		query.append("&date=2017.04.25");
+		query.append("&term=09:00-11:00");
+		query.append("&classify=팀 내부회의");
+		query.append("&purpose=인사지원실 내부회의");
+		query.append("&peoples=10");
+		query.append("&teams=인사지원실");
+		query.append("&equipments=노트북, 마이크");
+		query.append("&snacks=음료(10)");
+		query.append("&price=50,000");
+		query.append("&state=예약대기");
+		
+		String body = "";
+		
+		try {
+			
+			body = HttpReader.getHtmlString("http://localhost:8181/TeamProject/mailFormCen", query.toString());
+
+			//에러 페이지일 경우 메일 보내지 않음
+			if( 0 <= body.indexOf("Error") ){
+				System.out.println("메일 전송 실패 - 폼 작성 에러");
+				return;
+			}
+			
+			//debug
+			//System.out.println(body);
+			
+			//발신자 정보 설정
+			MailManager mn = new MailManager("김태형", "it0907@gsitm.com", new String(Base64.getDecoder().decode("MTg5OTkxNQ==")));
+			
+			//수신자로 전송
+			String result = mn.sendMail("it0907@gsitm.com", "회의실 예약 안내 테스트 메일입니다.", body);
+			
+			//debug
+			System.out.println("메일 전송 결과 - " + result);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}

@@ -1,0 +1,290 @@
+<!--
+	author  : 김준호
+	since   : 2017. 4. 19.
+	version : 1.0
+	subject : 회의실 조회 화면
+	description : 회의실 및 교육실 조회 폼
+-->
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>회의실 예약</title>
+		<link rel="stylesheet" href="${pageContext.servletContext.contextPath}/resources/css/jquery-ui.css">
+		<link rel="stylesheet" href="${pageContext.servletContext.contextPath}/resources/css/common.css">
+		<script src="${pageContext.servletContext.contextPath}/resources/js/jquery.min.js"></script>
+		<script src="${pageContext.servletContext.contextPath}/resources/js/jquery-ui.min.js"></script>
+		<script type="text/javascript">
+			//이용시간
+			var timeList = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00',
+							'13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00',
+							'16:30', '17:00', '17:30', '18:00'];
+			//달력
+			$(document).ready(function(){
+
+				//startHour값 채우기
+				for(var i=0; i < timeList.length; i++){
+					$('#startHour').append('<option value="' + timeList[i] + ':00">' + timeList[i] + '</option>');
+				}
+				//startHour선택 시 선택시간 이후의 finishHour값 채우기
+				$('#startHour').change(function() {
+					$('#finishHour option').remove();
+					var selectedIdx = $('#startHour option').index($('#startHour option:selected'));
+					for(var s = selectedIdx; s < timeList.length; s++){
+						$('#finishHour').append('<option value="' + timeList[s] + ':00">' + timeList[s] + '</option>');
+					}
+				});
+				today = new Date();
+				//오늘 날짜를 기본값으로 출력
+				$("#selectedDate").val($.datepicker.formatDate('yy-mm-dd', today));
+				$("#selectedDate").datepicker({
+					dateFormat: 'yy-mm-dd',
+			        prevText: '이전 달',
+			        nextText: '다음 달',
+			        monthNames: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+			        monthNamesShort: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+			        dayNames: ['일', '월', '화', '수', '목', '금', '토'],
+			        dayNamesShort: ['일', '월', '화', '수', '목', '금', '토'],
+			        dayNamesMin: ['일', '월', '화', '수', '목', '금', '토'],
+			        /* minDate: 0, */
+			        showMonthAfterYear: true,
+			        yearSuffix: '년'
+				});
+				//이전 버튼을 클릭 했을 경우
+				$("#prevDayBtn").click(function(){
+					var date = $('#selectedDate').datepicker('getDate');
+					//날짜를 하루 빼주고 텍스트 박스에 출력
+				    date.setTime(date.getTime() - (1000*60*60*24))
+				    $('#selectedDate').datepicker("setDate", date);
+				})
+				//다음 버튼을 클릭 했을 경우
+				$("#nextDayBtn").click(function(){
+					var date = $('#selectedDate').datepicker('getDate');
+					//날짜를 하루 더해서 텍스트 박스에 출력
+				    date.setTime(date.getTime() + (1000*60*60*24))
+				    $('#selectedDate').datepicker("setDate", date);
+				})
+
+			});
+			/*//회의실 상세정보 모달
+			$(function() {
+				$('#dialog').dialog({
+					autoOpen : false, //자동으로 열리지 않도록 함
+					resizable : false, //크기 조절을 못하게 함
+
+				});
+				$('#detailInfoBtn').click(function() {
+					$('#dialog').dialog('open');
+				});
+			}); */
+			function open_win(url){
+				window.open(url, "width=800, height=700");
+			}
+		</script>
+		<style>
+			/* form{
+				width:800px;
+			} */
+			/* '날짜 이동' 버튼 스타일*/
+			.calBtn{
+				width: 25px;
+			    height: 25px;
+			    font-size: 15px;
+			    color: white;
+			    text-align: center;
+			    background: black;
+			    border: solid 1px black;
+			    border-radius: 20px;
+			}
+			/* 날짜 출력 텍스트 박스 스타일*/
+			#selectedDate{
+				background: black;
+				color: white;
+				text-align: center;
+				border: solid 1px black;
+			}
+			/* 회의실 정보 출력 테이블 */
+			#conferenceInfoTable{
+				text-align: center;
+			}
+
+			/* '조회' 버튼 스타일 */
+			#searchBtn{
+				height: 18px;
+				color: white;
+				background: #0054ff;
+				border: solid 1px #0054ff;
+				border-radius: 5px;
+			}
+			#div1{
+				margin: 10px 10px 10px 10px;
+			}
+			#div2{
+				margin: 10px 10px 10px 10px;
+				background: #CFCFCF;
+			}
+			/* 예약가능여부 -> '상세정보' 버튼 */
+			#detailInfoBtn{
+				width: 60px;
+			    height: 20px;
+				border-radius: 5px;
+			}
+			/* 예약가능여부 -> '예약' 버튼 */
+			#registerOfEmpBtn{
+				width: 60px;
+			    height: 20px;
+				border-radius: 5px;
+			}
+		</style>
+	</head>
+<body>
+<jsp:include page="/view/common/header.jsp"></jsp:include>
+	<div>
+		<h3>회의실 예약</h3>
+		<hr>
+	</div>
+	<div>
+		<form name="conferenceReservationCheck" method="post">
+			<div id="div1" style="text-align: center;">
+				<!-- 이전 날짜 이동 버튼 -->
+				<input type="button" id="prevDayBtn" class="calBtn" value="<">
+				<input type="text" id="selectedDate" name="selectedDate">
+				<!-- 다음 날짜 이동 버튼 -->
+				<input type="button" id="nextDayBtn" class="calBtn" value=">">
+			</div>
+			<div id="div2">
+				<table width="800" align="center">
+					<tr>
+						<td>●&nbsp;선택하신 회의실 및 이용시간</td>
+						<!-- 건물 선택 셀렉트 박스 -->
+						<td>건물명 <select id="selectedBuilding" name="selectedBuilding">
+								<option value="">선택하기</option>
+								<option value="재동본사">재동본사</option>
+								<option value="GS강남타워">GS강남타워</option>
+								<option value="GS강서타워">GS강서타워</option>
+						</select>
+						</td>
+						<!-- 이용시간 선택 셀렉트 박스 -->
+						<td>이용시간 <select id="startHour" name="startHour">
+						</select> ~ <select id="finishHour" name="finishHour">
+								<option value="09:00:00">09:00</option>
+								<option value="09:30:00">09:30</option>
+								<option value="10:00:00">10:00</option>
+								<option value="10:30:00">10:30</option>
+								<option value="11:00:00">11:00</option>
+								<option value="11:30:00">11:30</option>
+								<option value="12:00:00">12:00</option>
+								<option value="01:00:00">01:00</option>
+								<option value="01:30:00">01:30</option>
+								<option value="02:00:00">02:00</option>
+								<option value="02:30:00">02:30</option>
+								<option value="03:00:00">03:00</option>
+								<option value="03:30:00">03:30</option>
+								<option value="04:00:00">04:00</option>
+								<option value="04:30:00">04:30</option>
+								<option value="05:00:00">05:00</option>
+								<option value="05:30:00">05:30</option>
+								<option value="06:00:00">06:00</option>
+						</select>&nbsp;<input type="submit" id="searchBtn" name="searchBtn" value="조회" />
+						</td>
+					</tr>
+				</table>
+			</div>
+		</form>
+	</div>
+	<div>
+		<table id="conferenceInfoTable" border="1" width="800">
+			<tr>
+				<th>회의실명</th>
+				<th>위치</th>
+				<th>기본요금</th>
+				<th>예약가능여부</th>
+			</tr>
+		<!-- 사용자가 선택한 건물의 회의실 정보가 DB에 있는지 확인 -->
+		<c:if test="${roomList != null}">
+			<!-- 사용자가 선택한 건물의 회의실 정보가 DB에 있다면,
+			     해당 건물의 회의실 정보를 모두 출력 -->
+			<c:forEach var="room" items="${roomList}" varStatus="status">
+			<tr>
+				<!-- 회의실명 -->
+				<td><c:out value="${room.roomName}"/></td>
+				<!-- 회의실 위치 -->
+				<td><c:out value="${room.position}"/></td>
+				<!-- 회의실 사용요금 -->
+				<td><c:out value="${room.fee}"/></td>
+				<!-- 회의실 예약가능여부 -->
+				<td>
+					<form action="RoomDetailInfo" method="post">
+						<!-- 선택한 시간에 예약된 회의실이 있는 경우 -->
+						<%-- <c:if test="${reservationRoomList != null}">
+							<c:forEach var="reservationRoomList" items="${reservationRoomList}">
+								<c:if test="${reservationRoomList.regState == '예약대기'}">
+									<input type="button" class="btn" id="registerOfEmpBtn" value="${reservationRoomList.regState}" style="color:green" />
+								</c:if>
+							</c:forEach>
+						</c:if> --%>
+						<!-- 사용자가 선택한 시간에 회의실이 예약가능한지 불가능한지 출력 -->
+						<c:if test="${resAbleStr[status.index] == '예약불가'}">
+							<input type="button" class="btn" id="registerOfEmpBtn" value="${resAbleStr[status.index]}" style="color:red"/>
+						</c:if>
+						<c:if test="${resAbleStr[status.index] == '예약가능'}">
+							<input type="button" class="btn" id="registerOfEmpBtn" value="${resAbleStr[status.index]}"/>
+						</c:if>
+						<input type="submit" class="btn" id="detailInfoBtn" value="상세정보" />
+						<!-- 사용자가 선택한 회의실 -->
+						<input type="hidden" name="roomId" value="${room.roomId}">
+					</form>
+				</td>
+			</tr>
+			</c:forEach>
+		</c:if>
+		</table>
+	</div>
+
+	<div>
+		<table border="1" width="800">
+			<c:if test="${roomList != null}">
+				<tr>
+					<th>회의실명</th>
+					<th>9시</th>
+					<th></th>
+					<th>10시</th>
+					<th></th>
+					<th>11시</th>
+					<th></th>
+					<th>13시</th>
+					<th></th>
+					<th>14시</th>
+					<th></th>
+					<th>15시</th>
+					<th></th>
+					<th>16시</th>
+					<th></th>
+					<th>16시</th>
+					<th></th>
+					<th>17시</th>
+					<th>18시</th>
+				</tr>
+				<c:forEach var="room" items="${roomList}" varStatus="status">
+				<tr>
+					<td><c:out value="${room.roomName}"/></td>
+					<td colspan="2">></td>
+					<td colspan="2">></td>
+					<td colspan="2">></td>
+					<td colspan="2">></td>
+					<td colspan="2">></td>
+					<td colspan="2">></td>
+					<td colspan="2">></td>
+					<td colspan="2">></td>
+					<td colspan="2">></td>
+					<td colspan="2">></td>
+				</tr>
+				</c:forEach>
+			</c:if>
+		</table>
+	</div>
+
+<jsp:include page="/view/common/footer.jsp"></jsp:include>
+</body>
+</html>

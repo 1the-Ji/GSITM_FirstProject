@@ -1,0 +1,221 @@
+<%--
+author  : 김태형
+since   : 2017. 5. 2.
+version : 1.0
+subject : 회의실 예약 신청 화면
+description : 회의실 및 교육실 예약신청 입력 폼 화면
+--%>
+<%@page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>예약 신청</title>
+	<link rel="stylesheet" href="${pageContext.servletContext.contextPath}/resources/css/jquery-ui.css">
+	<link rel="stylesheet" href="${pageContext.servletContext.contextPath}/resources/css/font.css">
+	<script src="${pageContext.servletContext.contextPath}/resources/js/jquery v1.12.4.min.js"></script>
+	<script src="${pageContext.servletContext.contextPath}/resources/js/jquery-ui.min.js"></script>
+	<style type="text/css">
+		
+		#body {
+			text-align: center;
+		}
+		table {
+			margin: 0 auto;
+			border-spacing: 0;
+			width: 800px;
+		}
+		td {
+			padding: 6px;
+			border-bottom: 1px solid #ddd;
+		}
+		td:first-child {
+			background-color: #e9e9e9;
+			font-weight: bold;
+			text-align: center;
+		}
+		td:last-child {
+			text-align: left;
+			padding-left: 10px;
+		}
+		input[type="number"] {
+			width: 40px;
+		}
+		#dayModeTimePicker, #periodModeTimePicker {
+			display: inline;
+			margin-left: 20px;
+		}
+		#submitButtonContainer {
+			margin: 0 auto;
+			margin-top: 30px;
+		}
+		.datePicker {
+			width: 80px;
+			text-align: center;
+		}
+		.btn {
+			padding: 3px;
+			padding-left: 10px;
+			padding-right: 10px;
+			border: 1px solid #ddd;
+			text-decoration: none;
+			background-color: #D5D5D5;
+			color: #000;
+			box-shadow: 1px 1px 3px #ccc;
+		}
+		
+		.teamSelecterModal {
+		    position: fixed;
+		    top: 0;
+		    right: 0;
+		    bottom: 0;
+		    left: 0;
+		    background: rgba(0, 0, 0, 0.8);
+		    opacity:0;
+		    -webkit-transition: opacity 300ms ease-in;
+		    -moz-transition: opacity 300ms ease-in;
+		    transition: opacity 300ms ease-in;
+		    pointer-events: none;
+		}
+		.teamSelecterModal:target {
+		    opacity:1;
+		    pointer-events: auto;
+		}
+		.teamSelecterModal > div {
+			position: absolute;
+			top: 25%;
+			left: 25%;
+			width: 50%;
+			height: 45%;
+			padding: 16px;
+			border: 1px solid #000;
+			background-color: white;
+			overflow: auto;	
+		}
+	</style>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			
+			var today = new Date();
+			
+			//날짜선택기 기본 오늘로
+			$('.datePicker').val( today.getFullYear() + '-' + (today.getMonth()+1) + '-' + today.getDate() );
+			
+			//일일예약 모드 클릭시 시간 선택 뜨도록
+			$('#radioDay').click(function(){
+				if($('#radioDay').attr('checked') == 'checked'){
+					$('#dayModeTimePicker').css('display', 'inline');
+					$('#periodModeTimePicker').css('display', 'none');
+				}
+			});
+			
+			//기간예약 선택 시 datePicker 2개 뜨도록
+			$('#radioTerm').click(function(){
+				if($('#radioDay').attr('checked') == 'checked'){
+					$('#periodModeTimePicker').css('display', 'inline');
+					$('#dayModeTimePicker').css('display', 'none');
+				}
+			});
+			
+			$('#price').text('요금 500');
+   	});
+	</script>
+</head>
+<body>
+	<jsp:include page="/view/common/header.jsp"></jsp:include>
+	<div id="title">
+		<h3>예약 신청</h3>
+		<hr>
+	</div>
+	<div id="body">
+		<form method="post">
+		<table>
+			<tr>
+				<td>회의실</td>
+				<td>${location} &gt; ${room}</td>
+			</tr>
+			<tr>
+				<td>이용기간</td>
+				<td>
+					<input type="radio" id="radioDay" name="periodMode" value="day" checked="checked" />일일예약 
+					<input type="radio" id="radioTerm" name="periodMode" value="period"/>기간예약  
+					<div id="dayModeTimePicker">
+						이용일자: 
+						<input type="text" id="selectedDate" name="selectedDate" class="datePicker"/>
+						이용시간:
+						<select id="starthour" name="starthour">
+							<option value="0900">09:00</option>
+							<option value="0930">09:30</option>
+							<option value="1000">10:00</option> 
+						</select> ~ 
+						<select id="endhour" name="endhour">
+							<option value="0900">09:00</option>
+							<option value="0930">09:30</option>
+							<option value="1000">10:00</option>
+						</select>					
+					</div>
+					<div id="periodModeTimePicker"  class="innerDiv" style="display: none">
+						이용기간: 
+						<input type="text" id="startDate" name="startDate" class="datePicker"/> ~ 
+						<input type="text" id="endDate" name="endDate" class="datePicker"/>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td>사용구분</td>
+				<td>
+					<select id="classify">
+						<option>단일 팀 회의</option>
+						<option>다중 팀 회의</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td>사용목적</td>
+				<td>
+					<input type="text" name="purpose"/> ※ 사용 목적을 상세하게 입력해주세요.
+				</td>
+			</tr>
+			<tr>
+				<td>사용인원</td>
+				<td><input type="number" name="peoples" min="1" value="1"/>명</td>
+			</tr>
+			<tr>
+				<td>사용팀</td>
+				<td>
+					<select name='teams' size='5' style="width: 100px;">
+					</select>
+					<a href="#open" class="btn">사용팀 선택</a>
+				</td>
+			</tr>
+			<tr>
+				<td>기자재</td>
+				<td><input type="checkbox" name="equipments" value="1"/>프로젝터 <input type="checkbox" name="equipments" value="2"/> 마이크</td>
+			</tr>
+			<tr>
+				<td>간식</td>
+				<td>
+					음료<input type="number" min="0" value="0" name="drink"/>
+					다과<input type="number" min="0" value="0" name="snack"/>
+				</td>
+			</tr>
+			<tr>
+				<td>이용요금</td>
+				<td><span id="price">0</span>원</td>
+			</tr>
+		</table>
+		<div id="submitButtonContainer">
+			<input type="submit" class="btn" value="예약 신청"/>
+		</div>
+		</form>
+	</div>
+	
+	<%-- 사용팀 선택 모달폼 --%>
+	<div class="teamSelecterModal" id="open">
+        <div>
+            <p>사용 팀을 선택하세요. <a href="#close" class="btn">닫기</a></p>
+        </div>
+    </div>
+	<jsp:include page="/view/common/footer.jsp"></jsp:include>
+</body>
+</html>

@@ -1,0 +1,40 @@
+package com.gsitm.dao;
+
+public class ApprovalInfo {
+	private int approId;
+	private int depId;
+	private String captain;
+	private String empId;
+	private int regInId;
+
+	public int getApproId() {
+		return approId;
+	}
+	public void setApproId(int approId) {
+		this.approId = approId;
+	}
+	public int getDepId() {
+		return depId;
+	}
+	public void setDepId(int depId) {
+		this.depId = depId;
+	}
+	public String getCaptain() {
+		return captain;
+	}
+	public void setCaptain(String captain) {
+		this.captain = captain;
+	}
+	public String getEmpId() {
+		return empId;
+	}
+	public void setEmpId(String empId) {
+		this.empId = empId;
+	}
+	public int getRegInId() {
+		return regInId;
+	}
+	public void setRegInId(int regInId) {
+		this.regInId = regInId;
+	}
+}

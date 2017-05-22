@@ -1,0 +1,35 @@
+<%--
+	author  : IT1702015
+	since   : 2017. 4. 25.
+	version : 1.0
+	subject :
+	description :
+--%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+	<style>
+		footer {
+			width:100%;
+			height:80px;
+			position:relative;
+			bottom:0;
+			left:0;
+			border-top:1px solid black;
+		}
+		.footer{
+			padding:10px;
+			display:block;
+			margin:0 auto;
+			text-align:center;
+		}
+		#footer_logo{
+				width:100px;
+		}
+	</style>
+	<footer>
+	<div class="footer">
+		<img id="footer_logo" src="${pageContext.servletContext.contextPath}/resources/image/footer_logo.jpg">
+		<div>
+			<span>COPYRIGHT ⓒ 2017 GS ITM CO, LTD ALL RIGHT RESERVED. | TEL 02-2189-6700</span>
+		</div>
+	</div>
+	</footer>

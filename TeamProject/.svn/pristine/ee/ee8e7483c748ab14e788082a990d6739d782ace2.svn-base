@@ -1,0 +1,221 @@
+<%--
+	author  : 지승훈
+	since   : 2017. 5. 5.
+	version : 1.0
+	subject : 시스템관리자가 회의실을 관리 하기위한 JSP
+	description :
+--%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<script src="${pageContext.servletContext.contextPath}/resources/js/jquery.min.js"></script>
+		<link rel="stylesheet" href="${pageContext.servletContext.contextPath}/resources/css/common.css">
+		<link rel="stylesheet" href="${pageContext.servletContext.contextPath}/resources/css/room-info-form.css">
+		<title>교육실 등록</title>
+	</head>
+	<body>
+		<jsp:include page="/view/common/header.jsp"></jsp:include>
+		 <h2> 교육실 등록</h2>
+		 <hr/>
+		  <form method="post" enctype="multipart/form-data" action="../education/registeraction">
+		 <table>
+		  <tr>
+			   <td text-align="center">교육실명 </td>
+			   <td><input type = "text" id="roomName" name="roomName"/></td>
+		  </tr>
+		  <tr>
+		  		<td>교육실 위치 </td>
+		   	<td><input type = "text" id="position" name="position"/></td>
+		  </tr>
+		  <tr>
+		  		<td> 건물명 </td>
+		   	<td><input type = "text" id="buildName" name="buildName"/></td>
+		  </tr>
+		  <tr>
+		   	<td> 교육실 크기 </td>
+		   	<td><input type="text" id="roomSize" name="roomSize"/></td>
+		  </tr>
+		  <tr>
+		   	<td> 교육실 수용인원 </td>
+		   	<td><input type="number" id="numberOfEmp" name="numberOfEmp" min="1"/></td>
+		  </tr>
+		  <tr>
+		   	<td> 비치물품 </td>
+		   	<td>
+					<table class="fixture">
+						<tr>
+							<td>
+								비치물품명: <input type="text" id="fixtureName" name="name"/>
+								요금: <input type="number" id="fixturePay" name="pay" min="0"/>
+								<input type="button" id="regFixture" value="추가"> <input type="button" id="delFixture" value="삭제">
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<div class="fixtureList">
+									<table id="fixture">
+										<tr>
+											<th>물품</th>
+											<th>이용요금</th>
+										</tr>
+									</table>
+								</div>
+							</td>
+						</tr>
+					</table>
+		   	</td>
+		  </tr>
+  		  <tr>
+		   	<td> 간식 </td>
+		   	<td>
+					<table class="snack">
+						<tr>
+							<td>
+								간식명: <input type="text" id="snackName" name="name"/>
+								요금: <input type="number" id="snackPay" name="pay" min="0"/>
+								<input type="button" id="regsnack" value="추가"> <input type="button" id="delsnack" value="삭제">
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<div class="snackList">
+									<table id="snack">
+										<tr>
+											<th>간식</th>
+											<th>요금</th>
+										</tr>
+									</table>
+								</div>
+							</td>
+						</tr>
+					</table>
+		   	</td>
+		  </tr>
+		  <tr>
+			   <td> N/W 사용여부 </td>
+			   <td>
+			   	<input type = "radio" name = "netFlag" value="yes"checked> Yes
+   				<input type = "radio" name = "netFlag" value="no"> No
+			   </td>
+		  </tr>
+		  <tr>
+			   <td> 사용요금 </td>
+			   <td>
+		    		<input type ="number" id="fee" name="fee" min="0"> 원
+		  		</td>
+		  </tr>
+		  <tr>
+		   	<td> 교육실 이미지 </td>
+		   	<td>
+		   		<input type="file" id="uploadFile1" name="uploadFile1"><br>
+		   		<input type="file" id="uploadFile2" name="uploadFile2"><br>
+		   		<input type="file" id="uploadFile3" name="uploadFile3"><br>
+		   	</td>
+		  </tr>
+		</table>
+		<br/>
+		<div class="registerCheck">
+			<input type = "reset" value = "다시 입력"/>
+			<input type = "submit" id="submit" value = "가입하기"/>
+		</div>
+		</form>
+
+		<jsp:include page="/view/common/footer.jsp"></jsp:include>
+		<script>
+		$(document).ready(function(){
+			//비치물품 추가
+			$("#regFixture").on("click",function(){
+				var fixtureName = $(".fixture #fixtureName").val();
+				var fixturePay = $(".fixture #fixturePay").val();
+				var tag = "<tr class='fixture-colum'>";
+					 tag += 	"<td>" + fixtureName + "<input type='hidden' name='fixtureName' value='" + fixtureName + "'></td>";
+					 tag +=  "<td>" + fixturePay + "원<input type='hidden' name='fixturePay' value='" + fixturePay + "'></td>";
+					 tag +="</tr>";
+				$("div.fixtureList table").append(tag);
+			});
+			//간식 추가
+			$("#regsnack").on("click",function(){
+				var snackName = $(".snack #snackName").val();
+				var snackPay = $(".snack #snackPay").val();
+				var tag = "<tr class='snack-colum'>";
+					 tag += 	"<td>" + snackName+ "<input type='hidden' name='snackName' value='" + snackName + "'></td>";
+					 tag +=  "<td>" + snackPay + "원<input type='hidden' name='snackPay' value='" + snackPay + "'></td>";
+					 tag +="</tr>";
+				$("div.snackList table").append(tag);
+			});
+
+			//비치물품 삭제
+			$("#delFixture").on("click",function(){
+				console.log("aaaa");
+				$('.fixture-selected').remove();
+			});
+
+			//간식 삭제
+			$("#delsnack").on("click",function(){
+				console.log("aaaa");
+				$('.snack-selected').remove();
+			});
+
+			//비치물품 선택
+			 $("#fixture").on("click",".fixture-colum",function(){
+				 $(this).toggleClass("fixture-selected");
+			});
+			//간식 선택
+			 $("#snack").on("click",".snack-colum",function(){
+				 $(this).toggleClass("snack-selected");
+			});
+
+			//회의실 등록 예외 처리
+				$("#submit").on("click",function(){
+					if(!blankCheck($('#roomName'))){
+						$('#roomName').focus();
+					}else if(!blankCheck($('#position'))){
+						$('#position').focus();
+					}else if(!blankCheck($('#buildName'))){
+						$('#buildName').focus();
+					}else if(!blankCheck($('#roomSize'))){
+						$('#roomSize').focus();
+					}else if(!blankCheck($('#numberOfEmp'))){
+						$('#numberOfEmp').focus();
+					}else if(!blankCheck($('#fixtureName'))){
+						$('#fixtureName').focus();
+					}else if(!blankCheck($('#fixturePay'))){
+						$('#fixturePay').focus();
+					}else if($("#fixture tr").length <= 1){
+						$('#regFixture').focus();
+					}else if(!blankCheck($('#snackName'))){
+						$('#snackName').focus();
+					}else if(!blankCheck($('#snackPay'))){
+						$('#snackPay').focus();
+					}else if($("#snack tr").length <= 1){
+						$('#regsnack').focus();
+					}else if(!blankCheck($('#fee'))){
+						$('#fee').focus();
+					}else if(!blankCheck($('#uploadFile1'))){
+						$('#uploadFile1').focus();
+					}else if(!blankCheck($('#uploadFile2'))){
+						$('#uploadFile2').focus();
+					}else if(!blankCheck($('#uploadFile3'))){
+						$('#uploadFile3').focus();
+					}else{
+						alert('교육실 등록 되었습니다!!!');
+						return true;
+					}
+					return false;
+				});
+			});
+			//입력하지 않은 예외 체크
+			function blankCheck(data){
+				var $val = $(data).val();
+				if($val!=''){
+					return true;
+				}else{
+					return false;
+				}
+			}
+		</script>
+	</body>
+</html>

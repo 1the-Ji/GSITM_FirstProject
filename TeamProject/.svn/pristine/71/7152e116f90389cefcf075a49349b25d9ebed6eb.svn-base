@@ -1,0 +1,111 @@
+<%--
+	author  : 지승훈
+	since   : 2017. 5. 5.
+	version : 1.0
+	subject : 시스템관리자가 회의실을 관리 하기위한 JSP
+	description :
+--%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>JSP</title>
+	   <style>
+			h, td, tr, input, textarea, select, form{
+				font-family:고딕;
+				font-size:1em;
+				border-radius:5px;
+			}
+			table, FORM{
+				border-spacing:15px;
+			}
+			table,table th, table td{
+				border-collapse:collapse;
+				border:1px solid #B1B1B1;
+			}
+	  </style>
+	</head>
+	<body>
+		<jsp:include page="/view/common/administratorHeader.jsp"></jsp:include>
+		 <h2> 회의실 수정</h2>
+		 <hr/>
+		  <form method="post" enctype="multipart/form-data">
+		 <table>
+		  <tr>
+			   <td text-align="center">회의실명 </td>
+			   <td><input type = "text" /></td>
+		  </tr>
+		  <tr>
+		  		<td> 회의실 위치 </td>
+		   	<td><input type = "text"></td>
+		  </tr>
+		  <tr>
+		   	<td> 회의실 크기 </td>
+		   	<td><input type = "text"/></td>
+		  </tr>
+		  <tr>
+		   	<td> 회의실 수용인원 </td>
+		   	<td><input type = "text"/></td>
+		  </tr>
+		  <tr>
+		   	<td> 비치물품 </td>
+		   	<td>
+					<table>
+						<tr>
+							<td>
+								비치물품명: <input type="text"/> 이용요금: <input type="text"/>
+								<input type="button" value="추가"> <input type="button" value="삭제">
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<table>
+									<tr>
+										<td>비치물품</td>
+										<td>이용요금</td>
+									</tr>
+									<tr>
+										<td>프로젝터</td>
+										<td>10,000원</td>
+									</tr>
+									<tr>
+										<td>노트북</td>
+										<td>5,000원</td>
+									</tr>
+									<tr>
+										<td>마이크</td>
+										<td>3,000원</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+					</table>
+		   	</td>
+		  </tr>
+		  <tr>
+			   <td> N/W 사용여부 </td>
+			   <td>
+			   	<input type = "radio" name = "network" checked> 남자
+   				<input type = "radio" name = "network"> 여자
+			   </td>
+		  </tr>
+		  <tr>
+			   <td> 사용요금 </td>
+			   <td>
+		    		<input type = "text"/> 원
+		  		</td>
+		  </tr>
+		  <tr>
+		   	<td> 회의실 이미지 </td>
+		   	<td> <input type="file" name="photo[]" multiple="multiple"/> </td>
+		  </tr>
+		</table>
+		</form>
+		<br/>
+		<input type = "submit" value = "가입하기"/>
+		<input type = "reset" value = "다시 입력"/>
+		<jsp:include page="/view/common/footer.jsp"></jsp:include>
+	</body>
+</html>

@@ -1,0 +1,112 @@
+package com.gsitm.dao;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.sql.ResultSet;
+import com.gsitm.common.ConstString;
+import com.gsitm.dto.DepOfUseRoomDTO;
+import com.gsitm.dto.EmployeesDTO;
+/**
+ *
+ * @프로그램   : EmployeesDAO.java
+ * @작성일     : 2017. 5. 2.
+ * @작성자     : 지승훈
+ * @기능       : 회의실/교육실을 사용한 부서테이블을 위한 DAO
+ * @버전       : 1.0
+ *
+ */
+
+public class DepOfUseRoomDAO {
+	public static Connection getConnection() {
+	      Connection conn = null;
+	      try {
+	    	  Class.forName(ConstString.JDBC_DRIVER);
+		      conn = DriverManager.getConnection(ConstString.DB_SERVER, ConstString.DB_USER, ConstString.DB_PASSWD);
+	      } catch (Exception e) {
+	    	  new RuntimeException(e);
+	      }
+	      return conn;
+	   }
+
+	/**
+	 *
+	 * @작성일      : 2017. 5. 13.
+	 * @작성자      : 김태형
+	 * @기능    	: 회의실/교육실을 사용한 부서를 조회하기 위한 메소드
+	 * @메소드명    : select
+	 * @param regInId - reservation 테이블의 예약 ID
+	 * @return - 사용부서정보 리스트 (DepOfUseRoomDTO)
+	 */
+	public List<DepOfUseRoomDTO> select(int regInId){
+		Connection con = getConnection();
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		List<DepOfUseRoomDTO> depOfUseRoomList = new LinkedList<DepOfUseRoomDTO>();
+
+		String sql = "select * from dep_of_use_room where reg_in_id=? order by rownum asc";
+		try {
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, regInId);
+			rs = pstmt.executeQuery();
+
+			while(rs.next()){
+				DepOfUseRoomDTO dep = new DepOfUseRoomDTO();
+				dep.setRegInId(rs.getInt("reg_in_id"));
+				dep.setDepId(rs.getString("dep_id"));
+				depOfUseRoomList.add(dep);
+			}
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		} finally {
+			DepOfUseRoomDAO.close(con, pstmt);
+		}
+		return depOfUseRoomList;
+	}
+
+	/**
+	 *
+	 * @작성일  : 2017. 5. 13.
+	 * @작성자  : 김태형
+	 * @기능    : 예약 등록 시 사용 부서를 추가한다.
+	 * @메소드명 : insert
+	 * @param depOfUseRoomDTO - 예약사용 부서 테이블의 한 row를 나타내는 DTO
+	 */
+	public void insert(DepOfUseRoomDTO depOfUseRoomDTO){
+		Connection con = getConnection();
+		PreparedStatement pstmt = null;
+		String sql = "INSERT INTO dep_of_use_room (reg_in_id, dep_id) values (?, ?)"; //sql문 작성
+		try {
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, depOfUseRoomDTO.getRegInId());
+			pstmt.setString(2, depOfUseRoomDTO.getDepId());
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		} finally {
+			DepOfUseRoomDAO.close(con, pstmt);
+		}
+	}
+
+	/**
+	 *
+	 * @작성일      : 2017. 5. 2.
+	 * @작성자      : 지승훈
+	 * @기능    	:
+	 * @메소드명    : close
+	 * @param con
+	 * @param pstmt
+	 */
+	private static void close(Connection con, PreparedStatement pstmt) {
+		 try {
+			 pstmt.close();
+			 con.close();
+	      } catch (Exception e) {
+	         e.printStackTrace();
+	      }
+	}
+}

@@ -1,0 +1,21 @@
+<%--
+	author  : 지승훈
+	since   : 2017. 5. 2.
+	version : 1.0
+	subject : 로그인한 회원들의 정보 및 예약한 정보들을 볼수 있는 jsp
+	description :
+--%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>JSP</title>
+</head>
+<body>
+
+
+</body>
+</html>

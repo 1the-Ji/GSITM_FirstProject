@@ -1,0 +1,58 @@
+package com.gsitm.conferenceinfo;
+
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+/**
+ * Servlet implementation class ConferenceInfoAction
+ */
+@WebServlet("/ConferenceInfoAction")
+public class ConferenceInfoAction extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		response.sendRedirect("view/reservation/conferenceInfo.jsp");
+		//포워드 사용
+		/*PrintWriter out = response.getWriter();
+		out.print("ddd");*/
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		response.setContentType("text/html; charset=utf-8");
+
+		String date = request.getParameter("selectedDate");
+		String starthour = request.getParameter("starthour");
+		String endhour = request.getParameter("endhour");
+		String selectedBuilding = request.getParameter("selectedBuilding");
+
+		PrintWriter out = response.getWriter();
+		if(selectedBuilding.equals("selectBox01")){
+			out.println("선택한 회의실: <b> " + selectedBuilding + "</b><br>");
+		}else if(selectedBuilding.equals("selectBox02")){
+			out.println("선택한 회의실: <b> " + selectedBuilding + "</b><br>");
+		}else if(selectedBuilding.equals("selectBox03")){
+			out.println("선택한 회의실: <b> " + selectedBuilding + "</b><br>");
+		}
+
+		out.println("date: <b> " + date + "</b><br>");
+		out.println("starthour: <b> " + starthour + "</b><br>");
+		out.println("endhour: <b> " + endhour + "</b><br>");
+		out.println("selectedBuilding: <b> " + selectedBuilding + "</b><br>");
+
+		/*request.setAttribute("date", date);
+		request.setAttribute("starthour", starthour);
+		request.setAttribute("endhour", endhour);
+		request.setAttribute("selectedBuilding", selectedBuilding);
+
+		RequestDispatcher dispatcher = request.getRequestDispatcher("view/reservation/conferenceInfo.jsp");
+		dispatcher.forward(request, response);*/
+	}
+}

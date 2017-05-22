@@ -1,0 +1,93 @@
+<%--
+author  : 김태형
+since   : 2017. 4. 24.
+version : 1.0
+subject : 회의실 예약 안내메일 양식
+description : 회의실 예약자에게 발송되는 메일 본문내용 양식
+--%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>[GS ITM] 회의실 예약 확인 메일</title>
+	<style type="text/css">
+		body {
+			text-align: center;
+		}
+		table {
+			margin: 0 auto;
+			border-top: 2px solid #999;
+			border-bottom: 2px solid #999;
+			border-left: 2px solid #999;
+			border-right: 2px solid #999;
+			border-spacing: 0;
+		}
+		td {
+			padding: 6px;
+			border-bottom: 1px solid #ddd;
+		}
+		td:first-child {
+			width: 120px;
+			background-color: #e9e9e9;
+			font-weight: bold;
+			text-align: center;
+		}
+		td:last-child {
+			width: 300px;
+			text-align: left;
+			padding-left: 10px;
+		}
+	</style>
+</head>
+<body style="text-align: center;">
+	<h2>&quot;${name}&quot;님의 회의실 예약 신청이 완료되었습니다.</h2><br><br>
+	<h3>회의실 예약 확인 내역</h3>
+	<table style="margin: 0 auto;border-top: 2px solid #999;border-bottom: 2px solid #999;border-left: 2px solid #999;border-right: 2px solid #999;border-spacing: 0;">
+		<tr>
+			<td style="padding: 6px;border-bottom: 1px solid #ddd;width: 120px;background-color: #e9e9e9;font-weight: bold;text-align: center;">회의실</td>
+			<td style="padding: 6px;border-bottom: 1px solid #ddd;width: 300px;text-align: left;padding-left: 10px;">${location} > ${room}</td>
+		</tr>
+		<tr>
+			<td style="padding: 6px;border-bottom: 1px solid #ddd;width: 120px;background-color: #e9e9e9;font-weight: bold;text-align: center;">이용기간</td>
+			<td style="padding: 6px;border-bottom: 1px solid #ddd;width: 300px;text-align: left;padding-left: 10px;">${date}</td>
+		</tr>
+		<tr>
+			<td style="padding: 6px;border-bottom: 1px solid #ddd;width: 120px;background-color: #e9e9e9;font-weight: bold;text-align: center;">이용시간</td>
+			<td style="padding: 6px;border-bottom: 1px solid #ddd;width: 300px;text-align: left;padding-left: 10px;">${term}</td>
+		</tr>
+		<tr>
+			<td style="padding: 6px;border-bottom: 1px solid #ddd;width: 120px;background-color: #e9e9e9;font-weight: bold;text-align: center;">사용구분</td>
+			<td style="padding: 6px;border-bottom: 1px solid #ddd;width: 300px;text-align: left;padding-left: 10px;">${classify}</td>
+		</tr>
+		<tr>
+			<td style="padding: 6px;border-bottom: 1px solid #ddd;width: 120px;background-color: #e9e9e9;font-weight: bold;text-align: center;">사용목적</td>
+			<td style="padding: 6px;border-bottom: 1px solid #ddd;width: 300px;text-align: left;padding-left: 10px;">${purpose}</td>
+		</tr>
+		<tr>
+			<td style="padding: 6px;border-bottom: 1px solid #ddd;width: 120px;background-color: #e9e9e9;font-weight: bold;text-align: center;">사용인원</td>
+			<td style="padding: 6px;border-bottom: 1px solid #ddd;width: 300px;text-align: left;padding-left: 10px;">${peoples}명</td>
+		</tr>
+		<tr>
+			<td style="padding: 6px;border-bottom: 1px solid #ddd;width: 120px;background-color: #e9e9e9;font-weight: bold;text-align: center;">사용팀</td>
+			<td style="padding: 6px;border-bottom: 1px solid #ddd;width: 300px;text-align: left;padding-left: 10px;">${teams}</td>
+		</tr>
+		<tr>
+			<td style="padding: 6px;border-bottom: 1px solid #ddd;width: 120px;background-color: #e9e9e9;font-weight: bold;text-align: center;">기자재</td>
+			<td style="padding: 6px;border-bottom: 1px solid #ddd;width: 300px;text-align: left;padding-left: 10px;">${equipments}</td>
+		</tr>
+		<tr>
+			<td style="padding: 6px;border-bottom: 1px solid #ddd;width: 120px;background-color: #e9e9e9;font-weight: bold;text-align: center;">간식</td>
+			<td style="padding: 6px;border-bottom: 1px solid #ddd;width: 300px;text-align: left;padding-left: 10px;">${snacks}</td>
+		</tr>
+		<tr>
+			<td style="padding: 6px;border-bottom: 1px solid #ddd;width: 120px;background-color: #e9e9e9;font-weight: bold;text-align: center;">이용요금</td>
+			<td style="padding: 6px;border-bottom: 1px solid #ddd;width: 300px;text-align: left;padding-left: 10px;">${price}</td>
+		</tr>
+		<tr>
+			<td style="padding: 6px;border-bottom: 1px solid #ddd;width: 120px;background-color: #e9e9e9;font-weight: bold;text-align: center;">예약상태</td>
+			<td style="padding: 6px;border-bottom: 1px solid #ddd;width: 300px;text-align: left;padding-left: 10px;">${state}</td>
+		</tr>
+	</table>
+</body>
+</html>

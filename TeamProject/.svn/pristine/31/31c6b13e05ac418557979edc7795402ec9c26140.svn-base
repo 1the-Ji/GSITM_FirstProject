@@ -1,0 +1,167 @@
+package com.gsitm.servlet.reservation;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.gsitm.dao.ReservationDAO;
+import com.gsitm.dao.RoomDAO;
+import com.gsitm.dto.ReservationDTO;
+import com.gsitm.dto.RoomDTO;
+
+/**
+ * 
+ * @프로그램명 : ConferenceReserveAction.java
+ * @작성일    : 2017. 5. 2.
+ * @작성자    : 김태형
+ * @기능     : 예약 등록 서블릿
+ * @버전     : 1.0
+ *
+ */
+@WebServlet("/conferencereserve")
+public class ConferenceReserveAction extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+	
+	//Get요청 - 예약 신청 폼을 표시한다.
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		//인코딩 설정
+		response.setContentType("text/html;charset=UTF-8");
+	    request.setCharacterEncoding("UTF-8");
+	    PrintWriter out = response.getWriter();
+
+	    //요청시 파라미터 예시
+	    //http://localhost:8181/TeamProject/conferencereserve?roomId=CR21
+	    	
+	    //필수 파라미터 체크
+	    if(request.getParameter("roomId") != null){
+	    	
+	    	//회의실 정보 가져오기
+	    	RoomDTO room = (new RoomDAO()).selectRoomInfo(request.getParameter("roomId"));
+	    	if(room == null){
+	    		response.sendError(404);
+	    		return;
+	    	}
+	    	
+	    	//폼 화면에 표시할 회의실 정보 속성 설정
+	    	request.setAttribute("buildName", room.getBuildName());
+	    	request.setAttribute("roomName", room.getRoomName());
+	    	request.setAttribute("location", room.getPosition());
+	    	request.setAttribute("priceBase", room.getFee());
+	    	request.setAttribute("maxPeoples", 10); //회의실 정원
+	    	
+	    	RequestDispatcher dispatcher = request.getRequestDispatcher("./view/reservation/conferenceReserve.jsp");
+			
+	    	dispatcher.forward(request, response);
+	    }
+	    else{
+	    	response.sendError(404); //필수 파라미터가 없으면 404에러 리스폰스
+	    }
+		
+	}
+
+	//Post요청 - 폼에서 sumit한 결과를 valid한 후 DB에 등록한다.
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		//인코딩 설정
+		response.setContentType("text/html;charset=UTF-8");
+	    request.setCharacterEncoding("UTF-8");
+	      
+		PrintWriter out = response.getWriter();
+		
+		
+
+		Calendar startDate = Calendar.getInstance();
+		Calendar finishDate = Calendar.getInstance();
+		
+		//일일예약인 경우
+		if ("day".equals(request.getParameter("periodMode"))){
+
+			String paramStartDate = (String) request.getParameter("selectedDate");	//2017-05-05
+			String paramStartHour = (String) request.getParameter("startHour"); //09:30
+			String paramFinishHour = (String) request.getParameter("finishHour"); //10:00
+			
+			//시작시간 설정
+			startDate.set(Calendar.YEAR, Integer.parseInt(paramStartDate.split("-")[0]));
+			startDate.set(Calendar.MONTH, Integer.parseInt(paramStartDate.split("-")[1]));
+			startDate.set(Calendar.DATE, Integer.parseInt(paramStartDate.split("-")[2]));
+			startDate.set(Calendar.HOUR, Integer.parseInt(paramStartHour.split(":")[0]));
+			startDate.set(Calendar.MINUTE, Integer.parseInt(paramStartHour.split(":")[1]));
+			startDate.set(Calendar.SECOND, 0);
+			
+			//종료시간 설정 - 일일예약은 시작-종료의 일자가 같고 시간만 다름
+			finishDate.set(Calendar.YEAR, Integer.parseInt(paramStartDate.split("-")[0]));
+			finishDate.set(Calendar.MONTH, Integer.parseInt(paramStartDate.split("-")[1]));
+			finishDate.set(Calendar.DATE, Integer.parseInt(paramStartDate.split("-")[2]));
+			finishDate.set(Calendar.HOUR, Integer.parseInt(paramFinishHour.split(":")[0]));
+			finishDate.set(Calendar.MINUTE, Integer.parseInt(paramFinishHour.split(":")[1]));
+			finishDate.set(Calendar.SECOND, 0);
+			
+			//출력해봄
+			out.println("DATE로 변환된 시각: " + (new SimpleDateFormat("yyyy-MM-dd hh:mm:ss")).format(startDate.getTime()));
+
+		} else if ("period".equals(request.getParameter("periodMode"))){ 
+			//기간예약인 경우
+			String paramStartDate = (String) request.getParameter("startDate");	//2017-05-05
+			String paramFinishDate = (String) request.getParameter("finishDate"); 
+			
+			//시작일자
+			startDate.set(Calendar.YEAR, Integer.parseInt(paramStartDate.split("-")[0]));
+			startDate.set(Calendar.MONTH, Integer.parseInt(paramStartDate.split("-")[1]));
+			startDate.set(Calendar.DATE, Integer.parseInt(paramStartDate.split("-")[2]));
+			startDate.set(Calendar.HOUR, 9);
+			startDate.set(Calendar.MINUTE, 0);
+			startDate.set(Calendar.SECOND, 0);
+			
+			//종료일자
+			finishDate.set(Calendar.YEAR, Integer.parseInt(paramFinishDate.split("-")[0]));
+			finishDate.set(Calendar.MONTH, Integer.parseInt(paramFinishDate.split("-")[1]));
+			finishDate.set(Calendar.DATE, Integer.parseInt(paramFinishDate.split("-")[2]));
+			finishDate.set(Calendar.HOUR, 18);
+			finishDate.set(Calendar.MINUTE, 0);
+			finishDate.set(Calendar.SECOND, 0);
+		}
+		else {
+			//예외
+			response.sendError(404);
+			return;
+		}
+		
+		ReservationDTO reservationDTO = new ReservationDTO();
+		reservationDTO.setEmpId("IT0907");
+		reservationDTO.setRoomId(request.getParameter("roomId"));
+		reservationDTO.setStartDate(new Date(startDate.getTimeInMillis()));
+		reservationDTO.setFinishDate(new Date(finishDate.getTimeInMillis()));
+		reservationDTO.setFee(Integer.parseInt(request.getParameter("price")));
+		reservationDTO.setUseCount(Integer.parseInt(request.getParameter("peoples")));
+		reservationDTO.setApproDate(null); //승인시간
+		reservationDTO.setRegState("승인대기");
+		reservationDTO.setUseState(request.getParameter("classify"));
+		reservationDTO.setUsePurpose(request.getParameter("purpose"));
+		
+		
+		try {
+			(new ReservationDAO()).insert(reservationDTO);
+			
+			out.println("<h1>등록완료</h1>");
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			//out.println("<script type=\"text/javascript\">alert(\"예약 등록에 실패하였습니다.\");");
+			//out.println("location.href=\"./conferenceinfo\";</script>"); //예약조회 화면으로 이동
+		}
+		
+		
+		
+		//out.println("<script type=\"text/javascript\">alert(\"예약 신청이 완료되었습니다.\");");
+		//out.println("location.href=\"./view/mypage/myPage.jsp\";</script>");
+	}
+}

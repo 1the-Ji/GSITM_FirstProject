@@ -1,0 +1,96 @@
+package com.gsitm.servlet.reservation;
+
+import java.io.IOException;
+import java.util.List;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.gsitm.dao.FixtureDAO;
+import com.gsitm.dao.ReservationDAO;
+import com.gsitm.dao.RoomDAO;
+import com.gsitm.dao.SnackDAO;
+import com.gsitm.dto.FixtureDTO;
+import com.gsitm.dto.ReservationDTO;
+import com.gsitm.dto.RoomDTO;
+import com.gsitm.dto.SnackDTO;
+
+/**
+*
+* @프로그램명 : ConferenceReserveDeleteAction.java
+* @작성일     : 2017. 5. 14.
+* @작성자     : 김준호
+* @기능       : 예약 수정 서블릿
+* @버전       : 1.0
+*
+*/
+@WebServlet("/reserveupdate")
+public class ConferenceReserveUpdateAction extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		//인코딩 설정
+		response.setContentType("text/html;charset=UTF-8");
+	    request.setCharacterEncoding("UTF-8");
+
+	    //로그인 체크
+	    if(request.getSession().getAttribute("Employee") == null){
+	    	response.sendRedirect(request.getContextPath() + "/login");
+	    	return;
+	    }
+
+		String empId = request.getParameter("empId");	        //직원 아이디
+		String beforeRegInId = request.getParameter("regInId"); //예약 번호
+		String roomId = request.getParameter("roomId");			//회의실/교육실 아이디
+		String startHour = request.getParameter("startHour");
+		String finishHour = request.getParameter("finishHour");
+
+		System.out.println(startHour + finishHour);
+
+		//필수 파라미터 체크
+	    if((empId == null) || (beforeRegInId == null) || (roomId == null)){
+	    	response.sendError(404); //필수 파라미터가 없으면 404에러 리스폰스
+	    	return;
+	    }
+	    int regInId = Integer.parseInt(beforeRegInId);
+
+	    //회의실 정보 가져오기
+    	RoomDTO room = (new RoomDAO()).selectRoomInfo(roomId);
+    	if(room == null){
+    		response.sendError(404); //해당하는 roooId가 없을 경우 404에러 리스폰스
+    		return;
+    	}
+
+    	//선택한 회의실의 기자재 정보 가져오기
+    	List <FixtureDTO> fixtures = (new FixtureDAO()).select(roomId);
+
+    	//선택한 회의실의 간식 정보 가져오기
+    	List <SnackDTO> snacks = (new SnackDAO()).select(roomId);
+
+    	ReservationDTO reservationInfo = (new ReservationDAO()).selectById(regInId);
+
+    	//폼 화면에 표시할 회의실 정보 속성 설정
+    	request.setAttribute("room", room);
+    	request.setAttribute("fixtures", fixtures);
+    	request.setAttribute("snacks", snacks);
+    	request.setAttribute("startHour", reservationInfo.getStartDate());	 //사용시작 시간
+    	request.setAttribute("finishHour", reservationInfo.getFinishDate()); //사용종료 시간
+    	request.setAttribute("useState", reservationInfo.getUseState());	 //회의구분
+    	request.setAttribute("usePurpose", reservationInfo.getUsePurpose()); //사용목적
+    	request.setAttribute("useCount", reservationInfo.getUseCount());	 //사용인원
+    	request.setAttribute("useNetwork", reservationInfo.getUseNetwork());
+
+    	RequestDispatcher dispatcher = request.getRequestDispatcher("./view/reservation/conferenceReserveUpdate.jsp");
+    	dispatcher.forward(request, response);
+
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+	}
+
+}

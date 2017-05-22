@@ -1,0 +1,27 @@
+package com.gsitm.dto;
+
+public class RoomPhotoDTO {
+	private int photoId;
+	private int photoName;
+	private int roomId;
+	public int getPhotoId() {
+		return photoId;
+	}
+	public void setPhotoId(int photoId) {
+		this.photoId = photoId;
+	}
+	public int getPhotoName() {
+		return photoName;
+	}
+	public void setPhotoName(int photoName) {
+		this.photoName = photoName;
+	}
+	public int getRoomId() {
+		return roomId;
+	}
+	public void setRoomId(int roomId) {
+		this.roomId = roomId;
+	}
+
+
+}

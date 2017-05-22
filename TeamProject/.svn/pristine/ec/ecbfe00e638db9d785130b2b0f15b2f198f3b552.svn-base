@@ -1,0 +1,27 @@
+package com.gsitm.dto;
+
+public class PayInfoDTO {
+	private int payInfoId;
+	private int regInId;
+	private int depId;
+	public int getPayInfoId() {
+		return payInfoId;
+	}
+	public void setPayInfoId(int payInfoId) {
+		this.payInfoId = payInfoId;
+	}
+	public int getRegInId() {
+		return regInId;
+	}
+	public void setRegInId(int regInId) {
+		this.regInId = regInId;
+	}
+	public int getDepId() {
+		return depId;
+	}
+	public void setDepId(int depId) {
+		this.depId = depId;
+	}
+
+
+}

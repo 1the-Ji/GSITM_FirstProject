@@ -1,0 +1,289 @@
+<%--
+author  : 김준호
+since   : 2017. 5. 10.
+version : 1.0
+subject : 담당자 권한 관리
+description :
+--%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>담당자 권한 관리</title>
+<link rel="stylesheet" href="${pageContext.servletContext.contextPath}/resources/css/jquery-ui.css">
+<link rel="stylesheet" href="${pageContext.servletContext.contextPath}/resources/css/common.css">
+<link rel="stylesheet" href="${pageContext.servletContext.contextPath}/resources/css/jquery.treeview.css">
+<link rel="stylesheet" href="${pageContext.servletContext.contextPath}/resources/css/screen.css">
+<script src="${pageContext.servletContext.contextPath}/resources/js/jquery.min.js"></script>
+<script src="${pageContext.servletContext.contextPath}/resources/js/jquery-ui.min.js"></script>
+<script src="${pageContext.servletContext.contextPath}/resources/js/jquery.treeview.js"></script>
+<script src="${pageContext.servletContext.contextPath}/resources/js/jquery.cookie.js"></script>
+<style type="text/css">
+
+	#div0 {
+		width: 100%;
+		position: relative;
+		margin: 5px;
+		padding: 5px;
+	}
+
+	#div1 {
+		width: 100%;
+		height: 100px;
+		position: relative;
+	}
+
+	#div2 {
+		width: 100%;
+		height: 150px;
+		position: relative;
+		background-color: #cccccc;
+		display: table;
+	}
+
+	#div2_content {
+		vertical-align: middle;
+		display: table-cell;
+	}
+
+	#div3 {
+		width: 100%;
+		height: 100px;
+		position: relative;
+		background-color: #dddddd;
+		text-align: center;
+	}
+
+	#div4 {
+		width: 100%;
+		height: 20px;
+		margin: 20px;
+		text-align: center;
+	}
+	/* 관리자 권한 관리 테이블 스타일 */
+	#selectAdminTable {
+		margin: 0 auto;
+	}
+	/* 조직도 모달 스타일 */
+	.teamSelecterModal {
+	    position: fixed;
+	    top: 0;
+	    right: 0;
+	    bottom: 0;
+	    left: 0;
+	    background: rgba(0, 0, 0, 0.8);
+	    opacity:0;
+	    -webkit-transition: opacity 300ms ease-in;
+	    -moz-transition: opacity 300ms ease-in;
+	    transition: opacity 300ms ease-in;
+	    pointer-events: none;
+	}
+	/* 조직도 모달 스타일 */
+	.teamSelecterModal:target {
+	    opacity:1;
+	    pointer-events: auto;
+	}
+	/* 조직도 모달 스타일 */
+	.teamSelecterModal > div {
+		position: absolute;
+		top: 25%;
+		left: 25%;
+		width: 50%;
+		height: 45%;
+		padding: 16px;
+		border: 1px solid #000;
+		background-color: white;
+		overflow: auto;
+	}
+</style>
+<script type="text/javascript">
+	/* 조직도 트리 */
+	$(function() {
+		$("#tree").treeview({
+			collapsed: true,
+			animated: "medium",
+			control:"#sidetreecontrol",
+			persist: "location"
+		});
+	})
+</script>
+</head>
+<body>
+<jsp:include page="/view/common/userHeader.jsp"></jsp:include>
+<div id="div0">
+	<div id="div1">
+		<h3>권한 관리</h3>
+		<hr>
+		※회의실 담당자 선택시 주의사항
+	</div>
+	<div id="div2">
+		<div id="div2_content">
+		● 회의실 관리자는 회의실 및 대회의실 예약에 대한 승인권한이 있습니다. <br><br>
+		● 교육실 관리자는 교육실 예약에 대한 승인권한이 있습니다.
+		</div>
+	</div>
+	관리자 권한 관리
+	<div id="div3">
+		<table id="selectAdminTable">
+			<tr>
+				<td>회의실 관리자</td>
+				<td></td>
+				<td>교육실 관리자</td>
+				<td></td>
+			</tr>
+			<tr>
+				<td>
+					<select size='3' style="width: 100px;">
+					</select>
+				</td>
+				<td>
+					<a href="#open" class="btn">선택</a><br>
+					<input type="button" class="btn" value="삭제"/>
+				</td>
+				<td>
+					<select size='3' style="width: 100px;">
+					</select>
+				</td>
+				<td>
+					<a href="#open" class="btn">선택</a><br>
+					<input type="button" class="btn" value="삭제"/>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<div id="div4">
+		<input type="submit" class="btn" value="저장"/>
+		<input type="button" class="btn" value="취소"/>
+	</div>
+
+	<%-- 사용팀 선택 모달폼 --%>
+	<div class="teamSelecterModal" id="open">
+        <div>
+        	<div id="sidetree">
+				<div class="treeheader">&nbsp;</div>
+
+				<div id="sidetreecontrol"><a href="?#">전체 닫기</a> | <a href="?#">전체 열기</a></div>
+				<ul id="tree">
+					<li>
+						<strong>CFO 조직</strong>
+						<ul>
+							<li><a href="#">재무관리팀</a></li>
+						</ul>
+					</li>
+					<li>
+						<strong>기획실</strong>
+						<ul>
+							<li><a href="#">기획팀</a></li>
+						</ul>
+						<ul>
+							<li><a href="#">QA팀</a></li>
+							<li><a href="#">보안파트</a></li>
+							<li><a href="#">최적화파트</a></li>
+						</ul>
+					</li>
+					<li>
+						<strong>인사지원실</strong>
+						<ul>
+							<li><a href="#">인사파트</a></li>
+							<li><a href="#">태양광TFT</a></li>
+						</ul>
+					</li>
+					<li>
+						<strong>기술연구소</strong>
+					</li>
+					<li>
+						<strong>영업총괄센터</strong>
+						<ul>
+							<li><a href="#">SI영업팀</a></li>
+							<li><a href="#">ICT팀</a></li>
+						</ul>
+					</li>
+					<li>
+						<strong>SI사업부</strong>
+						<ul>
+							<li><a href="#">Account Lead</a></li>
+							<li><a href="#">기획파트</a></li>
+							<li><a href="#">플랜트/ICT사업팀</a></li>
+							<li><a href="#">SI사업팀</a></li>
+							<li><a href="#">솔루션파트</a></li>
+							<li><a href="#">ERP사업팀</a></li>
+						</ul>
+					</li>
+					<li>
+						<strong>SM사업부</strong>
+						<ul>
+							<li><a href="#">인프라총괄센터</a>
+								<ul>
+									<li><a href="#">데이터센터추진 TFT</a></li>
+								</ul>
+								<ul>
+									<li><a href="#">인프라기술지원파트</a></li>
+								</ul>
+								<ul>
+									<li><a href="#">TA지원파트</a></li>
+								</ul>
+							</li>
+							<li><a href="#">GSC SM센터</a>
+								<ul>
+									<li><a href="#">경영관리파트</a></li>
+								</ul>
+								<ul>
+									<li><a href="#">재무파트</a></li>
+								</ul>
+								<ul>
+									<li><a href="#">영업물류파트</a></li>
+								</ul>
+								<ul>
+									<li><a href="#">모바일파트</a></li>
+								</ul>
+								<ul>
+									<li><a href="#">인프라파트</a></li>
+								</ul>
+								<ul>
+									<li><a href="#">로열티파트</a></li>
+								</ul>
+								<ul>
+									<li><a href="#">플랜트운영파트</a></li>
+								</ul>
+							</li>
+							<li><a href="#">Shared Service센터</a>
+								<ul>
+									<li><a href="#">GSM운영파트</a></li>
+								</ul>
+							</li>
+							<li><a href="#">홈쇼핑 SM센터</a>
+								<ul>
+									<li><a href="#">기간계개발지원파트</a></li>
+								</ul>
+								<ul>
+									<li><a href="#">PD파트</a></li>
+								</ul>
+								<ul>
+									<li><a href="#">MC개발지원파트</a></li>
+								</ul>
+								<ul>
+									<li><a href="#">인프라운영지원파트</a></li>
+								</ul>
+							</li>
+							<li><a href="#">리테일 SM센터</a>
+								<ul>
+									<li><a href="#">GS리테일팀</a></li>
+								</ul>
+							</li>
+						</ul>
+					</li>
+					<li>
+						<strong>CFO직속</strong>
+					</li>
+				</ul>
+			</div>
+            <p>사용 팀을 선택하세요.
+
+            <a href="#close" class="btn">닫기</a></p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

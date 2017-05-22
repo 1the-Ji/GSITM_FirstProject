@@ -1,0 +1,99 @@
+package com.gsitm.dto;
+
+import java.util.Date;
+/**
+ *
+ * @프로그램   : RoomDTO.java
+ * @작성일     : 2017. 5. 4.
+ * @작성자     : 지승훈
+ * @기능       : 회의실/교육실 정보 테이블을 위한 DTO
+ * @버전       : 1.0
+ *
+ */
+public class RoomDTO {
+	private String roomId;		 //회의실_교육실ID
+	private String roomName;	 //회의실이름
+	private String position;	 //회의실 위치
+	private String buildName;    //건물명
+	private int    fee;			 //사용요금
+	private String registerOfEmp;//예약가능여부
+	private String roomSize;	 //회의실크기
+	private String numberOfEmp;	 //수용인원
+	private String netFlag;	 	 //NW사용여부
+	private Date   startDate;	 //사용시작시간
+	private Date   finishDate;	 //사용종료시간
+	private String empId;		 //직원ID
+
+	public String getRoomId() {
+		return roomId;
+	}
+	public void setRoomId(String roomId) {
+		this.roomId = roomId;
+	}
+	public String getRoomName() {
+		return roomName;
+	}
+	public void setRoomName(String roomName) {
+		this.roomName = roomName;
+	}
+	public String getPosition() {
+		return position;
+	}
+	public void setPosition(String position) {
+		this.position = position;
+	}
+	public String getBuildName() {
+		return buildName;
+	}
+	public void setBuildName(String bulidName) {
+		this.buildName = bulidName;
+	}
+	public int getFee() {
+		return fee;
+	}
+	public void setFee(int fee) {
+		this.fee = fee;
+	}
+	public String getRegisterOfEmp() {
+		return registerOfEmp;
+	}
+	public void setRegisterOfEmp(String registerOfEmp) {
+		this.registerOfEmp = registerOfEmp;
+	}
+	public String getRoomSize() {
+		return roomSize;
+	}
+	public void setRoomSize(String roomSize) {
+		this.roomSize = roomSize;
+	}
+	public String getNumberOfEmp() {
+		return numberOfEmp;
+	}
+	public void setNumberOfEmp(String numberOfEmp) {
+		this.numberOfEmp = numberOfEmp;
+	}
+	public String getNetFlag() {
+		return netFlag;
+	}
+	public void setNetFlag(String netFlag) {
+		this.netFlag = netFlag;
+	}
+	public Date getStartDate() {
+		return startDate;
+	}
+	public void setStartDate(Date startDate) {
+		this.startDate = startDate;
+	}
+	public Date getFinishDate() {
+		return finishDate;
+	}
+	public void setFinishDate(Date finishDate) {
+		this.finishDate = finishDate;
+	}
+	public String getEmpId() {
+		return empId;
+	}
+	public void setEmpId(String empId) {
+		this.empId = empId;
+	}
+}

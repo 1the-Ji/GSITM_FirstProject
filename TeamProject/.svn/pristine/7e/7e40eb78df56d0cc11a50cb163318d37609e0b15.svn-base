@@ -1,0 +1,47 @@
+<%--
+	author  : IT1702015
+	since   : 2017. 4. 20.
+	version : 1.0
+	subject :
+	description :
+--%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<link rel="stylesheet" href="${pageContext.servletContext.contextPath}/resources/css/common.css">
+<link rel="stylesheet" href="${pageContext.servletContext.contextPath}/resources/css/header.css">
+<script src="${pageContext.servletContext.contextPath}/resources/js/jquery.min.js"></script>
+	<script>
+		$(function(){
+		  	var pull=$('#pull');
+		  	    menu=$('header ul');
+		  	    menuHeight=menu.height();
+		  	    logo = $('#logo');
+		  $(pull).on('click', function(e){
+		  	e.preventDefault();
+		  	$('#logo').remove();
+		  	menu.slideToggle();
+		  });
+		    $(window).resize(function(){
+		    	var w=$(window).width();
+		    	if(w>600 && menu.is(':hidden')){
+		    		menu.removeAttr('style');
+		    		$('header ul').prepend(logo);
+		    	}
+		    });
+		});
+	</script>
+	<div class="loginCheck">
+		<a href="${pageContext.servletContext.contextPath}/mypage"><img src="${pageContext.servletContext.contextPath}/resources/image/MyPageLogo.PNG"></a>
+		<a href="${pageContext.servletContext.contextPath}/mypage"><div>MyPage</div></a>
+   		<a href="${pageContext.servletContext.contextPath}/login"><div style="margin-right: 10px">Logout</div></a>
+    </div>
+	<header class="header_nav">
+	    <ul class="header_nav">
+	       <li id="logo"><a href="#"><img src="${pageContext.servletContext.contextPath}/resources/image/logo.png"></a></li>
+	       <li><a href="${pageContext.servletContext.contextPath}/view/reservation/reservationGuidance.jsp">예약안내</a></li>
+	       <li><a href="#">회의실예약</a></li>
+	       <li><a href="#">교육실예약</a></li>
+	       <li><a href="#">회의실신청목록</a></li>
+	       <li><a href="#">교육실신청목록</a></li>
+	    </ul>
+	    <a id="pull" href="#"><img src="${pageContext.servletContext.contextPath}/resources/image/logo.png"></a>
+	</header>

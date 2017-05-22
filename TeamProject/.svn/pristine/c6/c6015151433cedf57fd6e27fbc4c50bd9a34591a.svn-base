@@ -1,0 +1,76 @@
+package com.gsitm.servlet.reservation;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Date;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.gsitm.dao.ReservationDAO;
+import com.gsitm.dto.ReservationDTO;
+
+/**
+ * 
+ * @프로그램명 : ConferenceReserveAction.java
+ * @작성일    : 2017. 5. 2.
+ * @작성자    : 김태형
+ * @기능     : 예약 등록 서블릿
+ * @버전     : 1.0
+ *
+ */
+@WebServlet("/conferencereserve")
+public class ConferenceReserveAction extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+	
+	//Get요청 - 예약 신청 폼을 표시한다.
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		//인코딩 설정
+		response.setContentType("text/html;charset=UTF-8");
+	    request.setCharacterEncoding("UTF-8");
+		
+		RequestDispatcher dispatcher = request.getRequestDispatcher("./view/reservation/conferenceReserve.jsp");
+		dispatcher.forward(request, response);
+	}
+
+	//Post요청 - 폼에서 sumit한 결과를 valid한 후 DB에 등록한다.
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		//인코딩 설정
+		response.setContentType("text/html;charset=UTF-8");
+	    request.setCharacterEncoding("UTF-8");
+	      
+		PrintWriter out = response.getWriter();
+		
+		ReservationDTO reservationDTO = new ReservationDTO();
+		reservationDTO.setRoomId("CR01");
+		reservationDTO.setStartDate(new Date());
+		reservationDTO.setFinishDate(new Date());
+		reservationDTO.setFee(50000);
+		reservationDTO.setUseCount(10);
+		reservationDTO.setApproDate(new Date()); //승인시간인가?
+		reservationDTO.setRegState("승인대기");
+		reservationDTO.setUseState("사용구분");
+		reservationDTO.setUsePurpose("사용목적상세");
+		
+		try {
+			(new ReservationDAO()).insert(reservationDTO);
+			
+			out.println("<h1>등록완료</h1>");
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			out.println("<script type=\"text/javascript\">alert(\"예약 등록에 실패하였습니다.\");");
+			out.println("location.href=\"./conferenceinfo\";</script>"); //예약조회 화면으로 이동
+		}
+		
+		
+		
+		//out.println("<script type=\"text/javascript\">alert(\"예약 신청이 완료되었습니다.\");");
+		//out.println("location.href=\"./view/mypage/myPage.jsp\";</script>");
+	}
+}

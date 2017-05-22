@@ -1,0 +1,27 @@
+package com.gsitm.dto;
+/**
+ *
+ * @프로그램   : DepOfUseRoom.java
+ * @작성일     : 2017. 5. 4.
+ * @작성자     : 지승훈
+ * @기능       : 회의실/교육실을 사용한 부서테이블을 위한 DTO
+ * @버전       : 1.0
+ *
+ */
+public class DepOfUseRoom {
+	private int regInId;	// 예약 ID
+	private int depId;		// 부서 ID
+
+	public int getRegInId() {
+		return regInId;
+	}
+	public void setRegInId(int regInId) {
+		this.regInId = regInId;
+	}
+	public int getDepId() {
+		return depId;
+	}
+	public void setDepId(int depId) {
+		this.depId = depId;
+	}
+}

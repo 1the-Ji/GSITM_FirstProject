@@ -1,0 +1,97 @@
+package com.gsitm.servlet.reservation;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.gsitm.dao.ReservationDAO;
+
+/**
+ *
+ * @프로그램명 : ConferenceReserveDeleteAction.java
+ * @작성일     : 2017. 5. 14.
+ * @작성자     : 김준호
+ * @기능       : 예약 취소 서블릿
+ * @버전       : 1.0
+ *
+ */
+@WebServlet("/reservedelete")
+public class ConferenceReserveDeleteAction extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+		//인코딩 설정
+		response.setContentType("text/html;charset=UTF-8");
+	    request.setCharacterEncoding("UTF-8");
+
+	    //로그인 체크
+  		if(request.getSession().getAttribute("login") == null){
+  			response.sendRedirect(request.getContextPath() + "/login");
+  			return;
+  		}
+
+		PrintWriter out = response.getWriter();
+		//예약 번호
+		String regInId = request.getParameter("regInId");
+		//예약 시간
+		String startDate = request.getParameter("startDate");
+
+		System.out.println(regInId);
+		System.out.println(startDate);
+		//필수 파라미터 체크
+	    if(regInId == null){
+	    	response.sendError(404); //필수 파라미터가 없으면 404에러 리스폰스
+	    	return;
+	    }
+	    try{
+	    	//회의실 및 교육실 사용시작 시각
+	    	Calendar startHour = Calendar.getInstance();
+	    	//현재 시각
+	    	Calendar curTime = Calendar.getInstance();
+
+	    	startHour.set(Calendar.YEAR, Integer.parseInt(startDate.substring(0,4)));
+	    	startHour.set(Calendar.MONTH, Integer.parseInt(startDate.substring(5,7)) - 1);
+	    	startHour.set(Calendar.DAY_OF_MONTH, Integer.parseInt(startDate.substring(8,10)));
+	    	startHour.set(Calendar.HOUR_OF_DAY, Integer.parseInt(startDate.substring(11,13)));
+	    	startHour.set(Calendar.MINUTE, Integer.parseInt(startDate.substring(14,16)));
+	    	startHour.set(Calendar.SECOND, 00);
+	    	//회의실 및 교육실 사용시작 2시간 전에는 예약취소를 불가시키기 위해 시간을 -2시킴
+	    	startHour.add(Calendar.HOUR_OF_DAY,-2);
+
+	    	//현재 시간이 회의실 및 교육실을 사용 시작하기로 한 2시간 이후인 경우 취소 불가
+	    	if(curTime.after(startHour)){
+	    		out.println("<script type='text/javascript'>alert('사용시작 2시간 전에는 예약을 취소할 수 없습니다.');</script>;");
+
+	    		System.out.println("사용시작 2시간 전에는 예약을 취소할 수 없습니다.");
+	    	}
+	    	//현재 시간이 회의실 및 교육실을 사용 시작하기로 한 이전인 경우 취소 가능
+	    	else {
+	    		int RegInId = Integer.parseInt(request.getParameter("regInId"));
+				new ReservationDAO().delete(RegInId);
+				System.out.println("예약 취소 성공");
+				out.println("<script type='text/javascript'>alert('예약이 성공적으로 취소 되었습니다.')</script>;");
+	    	}
+	    }catch(Exception e){
+	    	e.printStackTrace();
+	    	out.println("<script type='text/javascript'>alert('예약 취소가 실패하였습니다.'); </script>");
+	    }finally{
+	    	//예약 삭제가 성공하거나 실패했을 경우 마이페이지로 이동
+	    	out.println("<script type='text/javascript'>location.href = './mypage'; </script>");
+	    }
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+	}
+
+}

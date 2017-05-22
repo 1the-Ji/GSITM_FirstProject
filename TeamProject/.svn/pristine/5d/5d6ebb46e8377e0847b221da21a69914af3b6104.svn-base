@@ -1,0 +1,211 @@
+<%--
+	author  : 지승훈
+	since   : 2017. 5. 5.
+	version : 1.0
+	subject : 시스템관리자가 회의실을 관리 하기위한 JSP
+	description :
+--%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<script src="${pageContext.servletContext.contextPath}/resources/js/jquery.min.js"></script>
+		<title>JSP</title>
+	   <style>
+			h, td, tr, input, textarea, select, form{
+				font-family:고딕;
+				font-size:1em;
+				border-radius:5px;
+			}
+			table, FORM{
+				border-spacing:15px;
+			}
+			table,table th, table td{
+				border-collapse:collapse;
+				border:1px solid #B1B1B1;
+			}
+			table{
+				margin:0 auto;
+			}
+			table table table{
+				width: 600px;
+			}
+			.fixtureList, .snackList{
+				width:  620px;
+				height: 100px;
+				position: relative;
+				overflow :scroll;
+			}
+
+			.registerCheck{
+				display: table;
+				margin: 0 auto;
+
+			}
+			.registerCheck input{
+					margin: 0 5px;
+			}
+		   .fixtureList table tr.fixture-selected, .snackList table tr.snack-selected{
+				background-color: #C3C3C3;
+			}
+	  </style>
+	</head>
+	<body>
+		<jsp:include page="/view/common/header.jsp"></jsp:include>
+		 <h2> 회의실 등록</h2>
+		 <hr/>
+		  <form method="post" enctype="multipart/form-data" action="../conference/registeraction">
+		 <table>
+		  <tr>
+			   <td text-align="center">회의실명 </td>
+			   <td><input type = "text" name="roomName"/></td>
+		  </tr>
+		  <tr>
+		  		<td> 회의실 위치 </td>
+		   	<td><input type = "text" name="position"/></td>
+		  </tr>
+		  <tr>
+		  		<td> 건물명 </td>
+		   	<td><input type = "text" name="buildName"/></td>
+		  </tr>
+		  <tr>
+		   	<td> 회의실 크기 </td>
+		   	<td><input type="text" name="roomSize"/></td>
+		  </tr>
+		  <tr>
+		   	<td> 회의실 수용인원 </td>
+		   	<td><input type="text" name="numberOfEmp"/></td>
+		  </tr>
+		  <tr>
+		   	<td> 비치물품 </td>
+		   	<td>
+					<table class="fixture">
+						<tr>
+							<td>
+								비치물품명: <input type="text" id="fixtureName" name="name"/>
+								요금: <input type="text" id="fixturePay" name="pay"/>
+								<input type="button" id="regFixture" value="추가"> <input type="button" id="delFixture" value="삭제">
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<div class="fixtureList">
+									<table id="fixture">
+										<tr>
+											<th>물품</th>
+											<th>이용요금</th>
+										</tr>
+
+									</table>
+								</div>
+							</td>
+						</tr>
+					</table>
+		   	</td>
+		  </tr>
+  		  <tr>
+		   	<td> 간식 </td>
+		   	<td>
+					<table class="snack">
+						<tr>
+							<td>
+								간식명: <input type="text" id="snackName" name="name"/>
+								요금: <input type="text" id="snackPay" name="pay"/>
+								<input type="button" id="regsnack" value="추가"> <input type="button" id="delsnack" value="삭제">
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<div class="snackList">
+									<table id="snack">
+										<tr>
+											<th>간식</th>
+											<th>이용요금</th>
+										</tr>
+									</table>
+								</div>
+							</td>
+						</tr>
+					</table>
+		   	</td>
+		  </tr>
+		  <tr>
+			   <td> N/W 사용여부 </td>
+			   <td>
+			   	<input type = "radio" name = "netFlag" value="yes"checked> Yes
+   				<input type = "radio" name = "netFlag" value="no"> No
+			   </td>
+		  </tr>
+		  <tr>
+			   <td> 사용요금 </td>
+			   <td>
+		    		<input type ="text" name="fee"> 원
+		  		</td>
+		  </tr>
+		  <tr>
+		   	<td> 회의실 이미지 </td>
+		   	<td>
+		   		<input type="file" name="uploadFile1"><br>
+		   		<input type="file" name="uploadFile2"><br>
+		   		<input type="file" name="uploadFile3"><br>
+		   	</td>
+		  </tr>
+		</table>
+		<br/>
+		<div class="registerCheck">
+			<input type = "submit"  value = "회의실등록"/>
+			<input type = "reset" value = "다시 입력"/>
+		</div>
+		</form>
+		<jsp:include page="/view/common/footer.jsp"></jsp:include>
+		<script>
+			$(document).ready(function(){
+				//비치물품 추가
+				$("#regFixture").on("click",function(){
+					var fixtureName = $(".fixture #fixtureName").val();
+					var fixturePay = $(".fixture #fixturePay").val();
+					var tag = "<tr class='fixture-colum'>";
+						 tag += 	"<td>" + fixtureName + "<input type='hidden' name='fixtureName' value='" + fixtureName + "'></td>";
+						 tag +=  "<td>" + fixturePay + "원<input type='hidden' name='fixturePay' value='" + fixturePay + "'></td>";
+						 tag +="</tr>";
+					$("div.fixtureList table").append(tag);
+				});
+				//간식 추가
+				$("#regsnack").on("click",function(){
+					var snackName = $(".snack #snackName").val();
+					var snackPay = $(".snack #snackPay").val();
+					var tag = "<tr class='snack-colum'>";
+						 tag += 	"<td>" + snackName+ "<input type='hidden' name='snackName' value='" + snackName + "'></td>";
+						 tag +=  "<td>" + snackPay + "원<input type='hidden' name='snackPay' value='" + snackPay + "'></td>";
+						 tag +="</tr>";
+					$("div.snackList table").append(tag);
+				});
+
+				//비치물품 삭제
+				$("#delFixture").on("click",function(){
+					console.log("aaaa");
+					$('.fixture-selected').remove();
+				});
+
+				//간식 삭제
+				$("#delsnack").on("click",function(){
+					console.log("aaaa");
+					$('.snack-selected').remove();
+				});
+
+
+				//비치물품 선택
+				 $("#fixture").on("click",".fixture-colum",function(){
+					 $(this).toggleClass("fixture-selected");
+				});
+				//간식 선택
+				 $("#snack").on("click",".snack-colum",function(){
+					 $(this).toggleClass("snack-selected");
+				});
+
+			});
+		</script>
+	</body>
+</html>

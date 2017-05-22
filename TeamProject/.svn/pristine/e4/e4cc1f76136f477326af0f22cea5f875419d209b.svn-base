@@ -1,0 +1,150 @@
+package com.gsitm.dao;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.gsitm.dto.RoomPhotoDTO;
+
+
+/**
+ *
+ * @프로그램   : EmployeesDAO.java
+ * @작성일     : 2017. 5. 2.
+ * @작성자     : 지승훈
+ * @기능       : 회의실/예약실 등록에 필요한 사진들 관련 DAO
+ * @버전       : 1.0
+ *
+ */
+
+public class RoomPhotoDAO {
+	public static Connection getConnection() {
+	      Connection conn = null;
+	      try {
+	         Class.forName("oracle.jdbc.driver.OracleDriver");
+	         conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:myoracle","ora_user","1234");
+	      } catch (Exception e) {
+	         e.printStackTrace();
+	      }
+	      return conn;
+	   }
+
+	/**
+	 *
+	 * @작성일      : 2017. 5. 2.
+	 * @작성자      : 지승훈
+	 * @기능    	: 회의실/교육실의 사진들을 등록하기위한 메소드
+	 * @메소드명    : insert
+	 * @param roomDTO
+	 */
+	public void insert(RoomPhotoDTO roomPhotoDTO){
+		Connection con = getConnection();
+		PreparedStatement pstmt = null;
+		String sql = null; //sql문 작성
+		   try {
+			   pstmt = con.prepareStatement(sql);
+
+			   pstmt.executeUpdate();
+		      } catch (SQLException e) {
+		         e.printStackTrace();
+		      } finally {
+		    	  RoomPhotoDAO.close(con, pstmt);;
+		      }
+	}
+
+	/**
+	 *
+	 * @작성일      : 2017. 5. 2.
+	 * @작성자      : 지승훈
+	 * @기능    	: 회의실/교육실의 사진들을 수정하기위한 메소드
+	 * @메소드명    : update
+	 * @param roomDTO
+	 */
+	public void update(RoomPhotoDTO roomPhotoDTO,int num){
+		Connection con = getConnection();
+		PreparedStatement pstmt = null;
+		String sql = null; //sql문 작성
+		   try {
+			   pstmt = con.prepareStatement(sql);
+
+			   pstmt.executeUpdate();
+		      } catch (SQLException e) {
+		         e.printStackTrace();
+		      } finally {
+		    	  RoomPhotoDAO.close(con, pstmt);;
+		      }
+	}
+
+	/**
+	 *
+	 * @작성일      : 2017. 5. 2.
+	 * @작성자      : 지승훈
+	 * @기능    	: 회의실/교육실의 사진들을 삭제하기위한 메소드
+	 * @메소드명    : delete
+	 * @param num
+	 */
+	public void delete(int num){
+		Connection con = getConnection();
+		PreparedStatement pstmt = null;
+		String sql = null; //sql문 작성
+		   try {
+			   pstmt = con.prepareStatement(sql);
+
+			   pstmt.executeUpdate();
+		      } catch (SQLException e) {
+		         e.printStackTrace();
+		      } finally {
+		    	  RoomPhotoDAO.close(con, pstmt);;
+		      }
+	}
+
+
+	/**
+	 *
+	 * @작성일      : 2017. 5. 2.
+	 * @작성자      : 지승훈
+	 * @기능    	: 회의실/교육실의 사진들의 리스트를 출력하기 위한 메소드
+	 * @메소드명    : selectAll
+	 * @param num
+	 * @return
+	 */
+	public List<RoomPhotoDTO> selectAll(int num){
+		Connection con = getConnection();
+		PreparedStatement pstmt = null;
+		List<RoomPhotoDTO> RoomPhotoList = new ArrayList<RoomPhotoDTO>();
+		String sql = null; //sql문 작성
+		   try {
+			   pstmt = con.prepareStatement(sql);
+
+			   pstmt.executeQuery();
+		      } catch (SQLException e) {
+		         e.printStackTrace();
+		      } finally {
+		    	  RoomPhotoDAO.close(con, pstmt);
+		      }
+
+		return RoomPhotoList;
+	}
+
+
+	/**
+	 *
+	 * @작성일      : 2017. 5. 2.
+	 * @작성자      : 지승훈
+	 * @기능    	:
+	 * @메소드명    : close
+	 * @param con
+	 * @param pstmt
+	 */
+	private static void close(Connection con, PreparedStatement pstmt) {
+		 try {
+			 pstmt.close();
+			 con.close();
+	      } catch (Exception e) {
+	         e.printStackTrace();
+	      }
+	}
+}

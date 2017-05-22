@@ -1,0 +1,27 @@
+package com.gsitm.dto;
+
+public class FixtureDTO {
+	private int fixtureId;
+	private String roomId;
+	private int pay;
+	public int getFixtureId() {
+		return fixtureId;
+	}
+	public void setFixtureId(int fixtureId) {
+		this.fixtureId = fixtureId;
+	}
+	public String getRoomId() {
+		return roomId;
+	}
+	public void setRoomId(String roomId) {
+		this.roomId = roomId;
+	}
+	public int getPay() {
+		return pay;
+	}
+	public void setPay(int pay) {
+		this.pay = pay;
+	}
+
+
+}

@@ -1,0 +1,361 @@
+<%--
+	author  : 지승훈
+	since   : 2017. 5. 5.
+	version : 1.0
+	subject : 예약 요청된 교육실들을 관리하기 위한 화면
+	description : 교육실 담당자가 예약 요청된 교육실에 대해서 결재승인 및 반려를 하기위한 폼
+--%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix = "fmt" uri = "http://java.sun.com/jsp/jstl/fmt"%>
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>교육실 결재목록</title>
+		<link rel="stylesheet" href="${pageContext.servletContext.contextPath}/resources/css/jquery-ui.css">
+		<link rel="stylesheet" href="${pageContext.servletContext.contextPath}/resources/css/common.css">
+		<link rel="stylesheet" href="${pageContext.servletContext.contextPath}/resources/css/system-manage.css">
+		<script src="${pageContext.servletContext.contextPath}/resources/js/jquery.min.js"></script>
+		<script src="${pageContext.servletContext.contextPath}/resources/js/jquery-ui.min.js"></script>
+		<style>
+			table{
+				text-align: center;
+				margin:0 auto;
+			}
+			.modal table {
+				width: 800px;
+			}
+			table, table td{
+				border-collapse:collapse;
+				border:1px solid #ccc;
+			}
+			table th{
+				background-color: #D5D5D5;
+				width:80px;
+			}
+			.checkName th{
+				height: 40px;
+				border-style:none;
+				text-align: left;
+				padding-left: 20px;
+			}
+			.checkName th input[type=text] {
+				text-align: center;
+				height: 21px;
+				font-size: 11pt;
+			}
+			.checkName button {
+				height: 25px;
+				width: 100px;
+			}
+			.paging{
+				display:table;
+				margin:0 auto;
+			}
+			.delete-content tr td:nth-child(1){
+				width: 80px;
+			}
+			#reject, #closeReject {
+				width: 80px;
+				height: 25px;
+			}
+		</style>
+		<script type="text/javascript">
+			$(document).ready(function(){
+
+				//datepicker 기본 형식 설정
+				$.datepicker.setDefaults({
+			        dateFormat: 'yy-mm-dd',
+			        prevText: '이전 달',
+			        nextText: '다음 달',
+			        monthNames: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+			        monthNamesShort: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+			        dayNames: ['일', '월', '화', '수', '목', '금', '토'],
+			        dayNamesShort: ['일', '월', '화', '수', '목', '금', '토'],
+			        dayNamesMin: ['일', '월', '화', '수', '목', '금', '토'],
+			        showMonthAfterYear: true,
+			        yearSuffix: '년',
+			        showMonthAfterYear : true,
+			    });
+
+				//datepicker 기본값 오늘날짜로
+				$('.datePicker').val($.datepicker.formatDate('yy-mm-dd', new Date()));
+
+				//시작일.
+	            $('#startDate').datepicker({
+	                buttonText: "시작일자",             // 버튼의 대체 텍스트
+	                onClose: function( selectedDate ) {
+	                    // 시작일(fromDate) datepicker가 닫힐때
+	                    // 종료일(toDate)의 선택할수있는 최소 날짜(minDate)를 선택한 시작일로 지정
+	                    $("#finishDate").datepicker( "option", "minDate", selectedDate );
+	                }
+	            });
+
+	            //종료일
+	            $('#finishDate').datepicker({
+	                buttonText: "종료일자",
+	                onClose: function( selectedDate ) {
+	                    // 종료일(toDate) datepicker가 닫힐때
+	                    // 시작일(fromDate)의 선택할수있는 최대 날짜(maxDate)를 선택한 종료일로 지정
+	                    $("#startDate").datepicker( "option", "maxDate", selectedDate );
+	                }
+	            });
+
+	            //승인버튼 클릭시 확인 유무
+	            $("#approval").on('click',function(){
+	            	if(confirm("결재 승인하시겠습니까?")!=0){
+			            return true;
+						}else
+				         return false;
+	            });
+
+	            //반려버튼 클릭시 확인 유무
+	            $("#reject").on('click',function(){
+	            	if(confirm("승인 반려 하시겠습니까?")!=0){
+			            return true;
+						}else
+				         return false;
+	            });
+
+	            $('#allTerm').click(function () {
+	            	$('#startDate').val("2000-01-01");
+	            	$('#finishDate').val(new Date().format("yyyy-MM-dd"));
+				});
+
+	            if('${searchClick}' == ''){
+	            	$('#search').click();
+	            }
+			});
+
+			//회의실 예약 정보 조회
+			function approval(regInId){
+				var modal = $("#approvalModal");
+    			modal.css('display','block');
+	  			$("#closeApproval").on('click',function(){
+			      	 var modal = $('#approvalModal');
+			        	 modal.css('display','none');
+	  	       });
+
+				$.ajax({
+						type: 'get' ,
+						url: '${pageContext.servletContext.contextPath}/education/approval/info' ,
+						data : {regInId},
+						dataType : 'json' ,
+						success: function(data) {
+							$("#regInId").html("예약자명"+"<input type='hidden' name='regInId'value='" + data.reservation.regInId + "'/>");
+							$("#empName").text(data.employee.empName)// 예약자 이름
+							//예약회 회의실-교육실에 대한 위치정보
+							var positionBuildName = "";
+							positionBuildname = data.room.buildName + "(" + data.room.position + ") > " + data.room.roomName;
+							// 이용기간
+							var regTerm = data.reservation.regTerm;
+							var startDate = data.startDate;
+							var finishDate = data.finishDate;
+							if(regTerm == "day"){
+								$("#usedate").text("단기예약 : " + startDate + " ~ " + finishDate);
+							}else if(regTerm = "period"){
+								$("#usedate").text("기간예약 : " + startDate + " ~ " + finishDate);
+							}
+							$("#positionBuildName").text(positionBuildname);
+							$("#regState").text(data.reservation.regState);	//회의구분
+							$("#useState").text(data.reservation.useState); //사용목적
+							//네트워크 사용
+							var useNetwork = data.reservation.useNetwork;
+							if(useNetwork == "Y"){
+								$("#useNetwork").text("사용");
+							}else if(useNetwork = "N"){
+								$("#useNetwork").text("사용안함");
+							}else{
+								$("#useNetwork").text("알수없음");
+							}
+							$("#useCount").text(data.reservation.useCount); //사용인원
+							$("#useTeam").text(data.useTeam); //이용 부서들
+							$("#fee").text(data.reservation.fee + "원"); //이용 요금
+							$("#fixture").text(data.fixture);//기자재 조회
+							$("#snack").text(data.snack);//간식 조회
+						}
+				});
+			}
+			function reject(regInId){
+	  			var modal = $("#rejectModal");
+				modal.css('display','block');
+				$("#regInfo").html("회의실 반려 확인" + "<input type='hidden' name='regInId' value='"+ regInId +"'/>");
+				$("#closeReject").on('click',function(){
+			    	 	var modal = $('#rejectModal');
+			    	 	modal.css('display','none');
+		       });
+			}
+			Date.prototype.format = function(f) {
+			    if (!this.valueOf()) return " ";
+			    var d = this;
+			    return f.replace(/(yyyy|yy|MM|dd|E|hh|mm|ss|a\/p)/gi, function($1) {
+			        switch ($1) {
+			            case "yyyy": return d.getFullYear();
+			            case "yy": return (d.getFullYear() % 1000).zf(2);
+			            case "MM": return (d.getMonth() + 1).zf(2);
+			            case "dd": return d.getDate().zf(2);
+			            default: return $1;
+			        }
+			    });
+			};
+			String.prototype.string = function(len){var s = '', i = 0; while (i++ < len) { s += this; } return s;};
+			String.prototype.zf = function(len){return "0".string(len - this.length) + this;};
+			Number.prototype.zf = function(len){return this.toString().zf(len);};
+		</script>
+	</head>
+	<body>
+		<jsp:include page="/view/common/header.jsp"></jsp:include>
+		<h2>교육실 예약 신청 목록</h2>
+		<hr/>
+		<table class="checkName">
+			<tr>
+				<th>
+					<form method="post">
+						<input type="text" id="startDate" name="startDate" class="datePicker"/> ~
+						<input type="text" id="finishDate" name="finishDate" class="datePicker"/>
+						<button id="allTerm" class="btn" style="width: 80px;" onclick="javascript:return false;">전체기간</button>
+						<button id="search" class="btn-bold">조회</button>
+					</form>
+				</th>
+			</tr>
+		</table><br>
+		<table>
+			<tr>
+				<th>건물명</th>
+				<th>회의실명</th>
+				<th>예약구분</th>
+				<th>사용기간</th>
+				<th>신청자</th>
+				<th>예약신청일</th>
+				<th style="width: 200px;">예약 승인 여부</th>
+			</tr>
+			<c:forEach var="res" items="${reservationList}" varStatus="status">
+				<tr>
+					<td>${roomList[status.index].buildName}</td>
+					<td>${roomList[status.index].roomName}</td>
+					<c:if test="${res.regTerm eq 'day'}">
+							<td>일일예약</td>
+							<td>
+								<fmt:formatDate pattern = "yyyy-MM-dd HH:mm" value = "${res.startDate}"/>~
+     							<fmt:formatDate pattern = "HH:mm" value = "${res.finishDate}"/>
+        					</td>
+					</c:if>
+					<c:if test="${res.regTerm eq 'period'}">
+						<td>기간예약</td>
+						<td>${res.startDate}~${res.finishDate}</td>
+					</c:if>
+					<td>${empNameList[status.index]} (${res.empId})</td>
+					<td>${res.regDate}</td>
+					<td>
+						<input type="button" id="approvalRoom" onclick="approval(${res.regInId})" value="승인" class="btn-bold"/>
+						<input type="button" id="cancelRoom" onclick="reject(${res.regInId})" value="반려" class="btn-red"/>
+					</td>
+				</tr>
+			</c:forEach>
+		</table>
+			<div class="paging">
+				<a href="${pageContext.servletContext.contextPath}/conference/manageaction?pageNo=1">[처음]</a>
+				<c:if test="${groupNo>1}">
+					<a href="${pageContext.servletContext.contextPath}/conference/manageaction?pageNo=${startPageNo-1}">[이전]</a>
+				</c:if>
+
+				<c:forEach var="i" begin="${startPageNo}" end="${endPageNo}">
+				 	<a href="${pageContext.servletContext.contextPath}/conference/manageaction?pageNo=${i}" <c:if test="${pageNo==i}">style="color:red"</c:if> > ${i} </a>
+				</c:forEach>
+
+				<c:if test="${groupNo<totalGroupNo}">
+				 	<a href="${pageContext.servletContext.contextPath}/conference/manageaction?pageNo=${endPageNo+1}">[다음]</a>
+				</c:if>
+				 <a href="${pageContext.servletContext.contextPath}/conference/manageaction?pageNo=${totalPageNo}">[맨끝]</a><%-- 제일 끝의 그룹 번호 --%>
+			</div>
+
+
+			<!-- 교육실 예약 승인 정보 modal -->
+			<div id="approvalModal" class="modal" style="padding-top: 120px;">
+			<form method="post" action="../education/approval/info">
+			  <div class="modal-content" style="width: 800px;">
+			  	 <div class="delete-title"><b>회의실 승인 확인</b></div>
+			  	 <hr/>
+			  	 <div class="delete-content">
+					<table>
+						<tr>
+							<td id="regInId">예약자명</td>
+							<td id="empName"></td>
+						</tr>
+						<tr>
+							<td>회의실</td>
+							<td id="positionBuildName"></td>
+						</tr>
+						<tr>
+							<td>이용기간</td>
+							<td id="usedate"></td>
+						</tr>
+						<tr>
+							<td>회의구분</td>
+							<td id="regState"></td>
+						</tr>
+						<tr>
+							<td>사용목적</td>
+							<td id="useState"></td>
+						</tr>
+						<tr>
+							<td>사용인원</td>
+							<td id="useCount"></td>
+						</tr>
+						<tr>
+							<td>사용팀</td>
+							<td id="useTeam"></td>
+						</tr>
+						<tr>
+							<td>네트워크</td>
+							<td id="useNetwork"></td>
+						</tr>
+						<tr>
+							<td>기자재</td>
+							<td id="fixture"></td>
+						</tr>
+						<tr>
+							<td>간식</td>
+							<td id="snack"></td>
+						</tr>
+						<tr>
+							<td>이용요금</td>
+							<td id="fee"></td>
+						</tr>
+				</table>
+			  	 </div>
+			  	 <div class="delete-content">
+			  		 <p><img id="warning"src="${pageContext.servletContext.contextPath}/resources/image/warning.png"> 정말 회의실을 승인 하시겠습니까?</p>
+			   	 비밀번호 입력 : <input id="modal-pwd" type="password" name="password"/>
+			  	 </div>
+			  	 <hr/>
+			  	 <div class="delete-footer">
+				    <input type="submit" id="approval" name="delete" value="승인" class="btn-bold"/>
+				    <input type="button" id="closeApproval"    name="close" value="취소" class="btn-gray" />
+			    </div>
+			  </div>
+			 </form>
+			</div>
+
+			<!-- 교육실 예약 반려  modal -->
+			<div id="rejectModal" class="modal">
+			<form method="post" action="../education/approval/reject">
+			  <div class="modal-content">
+			  	 <div class="delete-title"><b id="regInfo">회의실 반려 확인</b></div>
+			  	 <hr/>
+			  	 <div class="delete-content">
+			  		 <p><img id="warning"src="${pageContext.servletContext.contextPath}/resources/image/warning.png"> 정말 회의실을 반려 하시겠습니까?</p>
+			   	 비밀번호 입력 : <input id="modal-pwd" type="password" name="password"/>
+			  	 </div>
+			  	 <hr/>
+			  	 <div class="delete-footer">
+				    <input type="submit" id="reject" name="delete" value="삭제" class="btn-red"/>
+				    <input type="button" id="closeReject" value="취소" class="btn-gray"/>
+			    </div>
+			  </div>
+			 </form>
+			</div>
+		<jsp:include page="/view/common/footer.jsp"></jsp:include>
+	</body>
+</html>

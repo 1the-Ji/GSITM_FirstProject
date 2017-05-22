@@ -1,0 +1,27 @@
+package com.gsitm.dto;
+
+public class DepartmentsDTO {
+	private int depId;
+	private String depName;
+	private String empId;
+	public int getDepId() {
+		return depId;
+	}
+	public void setDepId(int depId) {
+		this.depId = depId;
+	}
+	public String getDepName() {
+		return depName;
+	}
+	public void setDepName(String depName) {
+		this.depName = depName;
+	}
+	public String getEmpId() {
+		return empId;
+	}
+	public void setEmpId(String empId) {
+		this.empId = empId;
+	}
+
+
+}

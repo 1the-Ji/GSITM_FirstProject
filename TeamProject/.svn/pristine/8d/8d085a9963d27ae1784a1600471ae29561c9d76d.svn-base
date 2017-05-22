@@ -1,0 +1,39 @@
+@CHARSET "UTF-8";
+h, td, tr, input, textarea, select, form{
+	font-size:1em;
+	border-radius:5px;
+}
+table, FORM{
+	border-spacing:15px;
+}
+table,table th, table td{
+	border-collapse:collapse;
+	border:1px solid #B1B1B1;
+}
+table{
+	margin:0 auto;
+}
+table table table{
+	width: 600px;
+}
+.fixtureList, .snackList{
+	width:  620px;
+	height: 100px;
+	position: relative;
+	overflow :scroll;
+}
+
+.registerCheck, .updateCheck{
+	display: table;
+	margin: 0 auto;
+}
+.registerCheck input, .updateCheck input{
+	margin: 0 5px;
+}
+.fixtureList table tr.fixture-selected, .snackList table tr.snack-selected{
+	background-color: #C3C3C3;
+}
+
+table{
+	background: red;
+}

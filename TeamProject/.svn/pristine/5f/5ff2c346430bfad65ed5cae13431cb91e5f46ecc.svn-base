@@ -1,0 +1,147 @@
+package com.gsitm.servlet.approval;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import com.google.gson.Gson;
+import com.gsitm.dao.DepOfUseRoomDAO;
+import com.gsitm.dao.DepartmentsDAO;
+import com.gsitm.dao.EmployeesDAO;
+import com.gsitm.dao.FixtureDAO;
+import com.gsitm.dao.RegOptionDAO;
+import com.gsitm.dao.ReservationDAO;
+import com.gsitm.dao.RoomDAO;
+import com.gsitm.dao.SnackDAO;
+import com.gsitm.dto.DepOfUseRoomDTO;
+import com.gsitm.dto.EmployeesDTO;
+import com.gsitm.dto.RegOptionDTO;
+import com.gsitm.dto.ReservationDTO;
+import com.gsitm.dto.RoomDTO;
+import com.gsitm.mail.MailSender;
+
+@WebServlet("/conference/approval/info")
+public class ConferenceApprovalInfoAction extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		System.out.println("conference approval Info : get()");
+
+		int regInId = Integer.parseInt(request.getParameter("regInId"));
+		System.out.println("aaa : " + regInId);
+
+		//예약 정보 조회
+		ReservationDTO reservationDTO = (new ReservationDAO()).selectById(regInId);
+		//예약한 직원 조회
+		EmployeesDTO employeesDTO = (new EmployeesDAO()).login(reservationDTO.getEmpId());
+		//예약한 회의실/교육실에 대한 정보 조회
+		RoomDTO roomDTO = (new RoomDAO()).selectRoomInfo(reservationDTO.getRoomId());
+		//이용 부서 조회
+		List<DepOfUseRoomDTO> depList = (new DepOfUseRoomDAO().select(reservationDTO.getRegInId()));
+		String teamName = "";
+		for(int i = 0;i<depList.size();i++){
+			teamName = teamName + (new DepartmentsDAO()).select(depList.get(i).getDepId()).getDepName();
+			if(i < depList.size()-1){
+				teamName = teamName + ", ";
+			}
+		}
+		String regTerm = reservationDTO.getRegTerm();
+		String startDate = "";
+		String finishDate = "";
+		if(regTerm.equals("day")){
+			startDate = (new SimpleDateFormat("yyyy-MM-dd HH:mm")).format(reservationDTO.getStartDate());
+			finishDate = (new SimpleDateFormat("HH:mm:ss")).format(reservationDTO.getFinishDate());
+		}else if(regTerm.equals("period")){
+			startDate = (new SimpleDateFormat("yyyy-MM-dd")).format(reservationDTO.getStartDate());
+			finishDate = (new SimpleDateFormat("yyyy-MM-dd")).format(reservationDTO.getFinishDate());
+		}
+		System.out.println("날짜 : " + startDate + " ~ " + finishDate);
+
+		//간식 기자재 조회
+		String snackListStr = "";
+		String fixtureListStr = "";
+        List<RegOptionDTO> regOptionList = (new RegOptionDAO()).select(reservationDTO.getRegInId());
+        for(RegOptionDTO regOption : regOptionList){
+           if(regOption.getFixtureId() != 0){
+              //기자재 이름 문자열 가져오기
+              fixtureListStr += (new FixtureDAO()).select(regOption.getFixtureId()).getName() + ", ";
+           }
+           if(regOption.getSnackId() != 0){
+              snackListStr += (new SnackDAO()).select(regOption.getSnackId()).getName()
+                    + "(" + regOption.getSnackCount() + "개), ";
+           }
+        }
+
+		//DAO에서 처리한 DTO를 hashMap을 통해서 값을 누적
+		Map<String,Object> map = new HashMap<String,Object>();
+		map.put("reservation", reservationDTO);
+		map.put("employee",employeesDTO);
+		map.put("room", roomDTO);
+		map.put("useTeam", teamName);
+		map.put("snack", snackListStr);
+		map.put("fixture", fixtureListStr);
+		map.put("startDate",startDate);
+		map.put("finishDate",finishDate);
+		Gson gson = new Gson();
+
+		 //옵션- 캐쉬 사용안하기
+        response.setHeader("Pragma","no-cache");
+        response.setHeader("Cache-Control","no-cache");
+        response.addHeader("Cache-Control","no-store");
+        response.setDateHeader("Expires",0);
+
+        response.setContentType("text/xml;charset=UTF-8");
+
+        PrintWriter writer = response.getWriter();
+
+        String outString="";
+        if(reservationDTO != null){
+            outString = gson.toJson(map);    //객체의 데이터를 JSON형태의 문자열로 변환
+            System.out.println(outString);  //콘솔에 출력
+        } else {
+            outString = "404";
+        }
+
+        writer.println(outString); //요청한 브라우저에 응답
+
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		System.out.println("conference approval info: post()");
+
+		String password = request.getParameter("password");
+		System.out.println("승인 처리 비밀번호 : " + password);
+
+		HttpSession session = request.getSession();
+		EmployeesDTO employDTO = (EmployeesDTO) session.getAttribute("Employee");
+		String employPwd = employDTO.getPassword();
+		System.out.println("직원 비밀번호"+employDTO.getPassword());
+
+
+		if(password.equals(employPwd)){
+			int regInId =  Integer.parseInt(request.getParameter("regInId"));
+			System.out.println("regInId : " + regInId);
+			(new ReservationDAO()).update(regInId, "승인완료");
+			String serverUrl = (request.getRequestURL().toString()).replace("/conference/approval/info", "/mailformgen");
+			String requestUser = (new EmployeesDAO()).login( (new ReservationDAO()).selectById(regInId).getEmpId()).getEmail();
+	         (new MailSender()).send( serverUrl, requestUser, "사용승인", regInId);
+			System.out.println("관리자 최종 승인 완료 성공");
+		}else{
+			System.out.println("관리자 최종 승인 완료 실패");
+		}
+
+		response.sendRedirect("../../conference/approval");
+	}
+
+}

@@ -1,0 +1,60 @@
+package com.gsitm.dto;
+
+public class EmployeesDTO {
+	private String empId;
+	private String password;
+	private String empName;
+	private String authority;
+	private int depId;
+	private String depName;
+	private String caption;
+	private String empPhoto;
+	public String getEmpId() {
+		return empId;
+	}
+	public void setEmpId(String empId) {
+		this.empId = empId;
+	}
+	public String getPassword() {
+		return password;
+	}
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	public String getEmpName() {
+		return empName;
+	}
+	public void setEmpName(String empName) {
+		this.empName = empName;
+	}
+	public String getAuthority() {
+		return authority;
+	}
+	public void setAuthority(String authority) {
+		this.authority = authority;
+	}
+	public int getDepId() {
+		return depId;
+	}
+	public void setDepId(int depId) {
+		this.depId = depId;
+	}
+	public String getDepName() {
+		return depName;
+	}
+	public void setDepName(String depName) {
+		this.depName = depName;
+	}
+	public String getCaption() {
+		return caption;
+	}
+	public void setCaption(String caption) {
+		this.caption = caption;
+	}
+	public String getEmpPhoto() {
+		return empPhoto;
+	}
+	public void setEmpPhoto(String empPhoto) {
+		this.empPhoto = empPhoto;
+	}
+}

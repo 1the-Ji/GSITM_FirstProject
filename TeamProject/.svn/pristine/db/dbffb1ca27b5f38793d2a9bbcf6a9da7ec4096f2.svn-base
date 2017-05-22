@@ -1,0 +1,133 @@
+package com.gsitm.servlet;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.gsitm.dao.DepOfUseRoomDAO;
+import com.gsitm.dao.DepartmentsDAO;
+import com.gsitm.dao.ReservationDAO;
+import com.gsitm.dao.RoomDAO;
+import com.gsitm.dto.DepOfUseRoomDTO;
+import com.gsitm.dto.ReservationDTO;
+import com.gsitm.dto.RoomDTO;
+
+/**
+ * 
+ * @프로그램명 : MyPageAction.java
+ * @작성일    : 2017. 5. 13.
+ * @작성자    : 김태형
+ * @기능     : My Page 프로필 및 예약 내역 조회 서블릿
+ * @버전     : 1.0
+ *
+ */
+@WebServlet("/mypage")
+public class MyPageAction extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+		//인코딩 설정
+		response.setContentType("text/html;charset=UTF-8");
+		request.setCharacterEncoding("UTF-8");
+
+		//로그인 체크
+		if(request.getSession().getAttribute("login") == null){
+			response.sendRedirect(request.getContextPath() + "/login");
+			return;
+		}
+		
+		PrintWriter out = response.getWriter();
+
+		try {
+			String loginId = (String) request.getSession().getAttribute("login");
+			String filter = request.getParameter("filter");
+			String filterQuery = "%%";
+
+			//예약내역 가져올 리스트변수
+			List<ReservationDTO> resList;
+
+			if("req".equals(filter)){
+				filterQuery = "%대기";
+			} else if ("sign".equals(filter)){
+				filterQuery = "결재완료";
+			} else if ("appro".equals(filter)){
+				filterQuery = "승인완료";
+			} else if ("finish".equals(filter)){
+				filterQuery = "사용완료";
+			} else if ("cencel".equals(filter)){
+				filterQuery = "%취소";
+			} else if ("reject".equals(filter)){
+				filterQuery = "%반려";
+			} else {
+				filterQuery = "%%";
+			}
+			
+			//예약내역 가져오기
+			resList = (new ReservationDAO()).select(loginId, filterQuery);
+			
+			if(filter != null && resList.size() == 0){
+				out.println("<script type='text/javascript'>alert('조회된 예약 내역이 없습니다.');location.href = './mypage';</script>");
+				return;
+			}
+			
+			//예약 룸정보
+			List<RoomDTO> roomList = new LinkedList<RoomDTO>();
+
+			//예약 부서정보 문자열 리스트 ("인사지원실 외 1" 형식으로 저장됨)
+			List<String> teamsList = new LinkedList<String>();
+			
+			//수정취소 버튼 표시여부
+			List<String> modAbleList = new LinkedList<String>();
+
+			for(ReservationDTO res : resList){
+				RoomDTO room = (new RoomDAO()).selectRoomInfo(res.getRoomId());
+				roomList.add(room);
+
+				//예약 부서정보
+				List<DepOfUseRoomDTO> depList = (new DepOfUseRoomDAO().select(res.getRegInId()));
+				if(depList.size() == 1){
+					//팀수가 하나일 경우 팀 이름만
+					String teamName = (new DepartmentsDAO()).select(depList.get(0).getDepId()).getDepName();
+					teamsList.add(teamName);
+				}
+				else if (depList.size() > 1) {
+					String teamName = (new DepartmentsDAO()).select(depList.get(0).getDepId()).getDepName();
+					teamsList.add(teamName + " 외 " + (depList.size()-1) + "팀");
+				}
+				
+				//예약변경 취소 버튼 표시여부
+				if( 1 < res.getRegState().indexOf("대기") 
+						|| "결재완료".equals(res.getRegState())
+						|| "승인완료".equals(res.getRegState())){
+					modAbleList.add("true");
+				}
+				else {
+					modAbleList.add("false");
+				}
+			}
+
+			request.setAttribute("reservationList", resList);
+			request.setAttribute("rooms", roomList);
+			request.setAttribute("teamsList", teamsList);
+			request.setAttribute("modAbleList", modAbleList);
+			
+			RequestDispatcher dispatcher = request.getRequestDispatcher("./view/mypage/myPage.jsp");
+			dispatcher.forward(request, response);
+		} finally {
+			out.println("<script type='text/javascript'>location.href = './mypage';</script>");
+		}
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		doGet(request, response);
+	}
+}

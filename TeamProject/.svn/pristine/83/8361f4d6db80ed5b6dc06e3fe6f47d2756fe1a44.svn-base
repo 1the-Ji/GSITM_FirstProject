@@ -1,0 +1,60 @@
+package com.gsitm.servlet.conferenceinfo;
+
+
+import java.io.IOException;
+import java.util.List;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.gsitm.dao.RoomDAO;
+import com.gsitm.dto.FixtureDTO;
+import com.gsitm.dto.RoomDTO;
+import com.gsitm.dto.RoomPhotoDTO;
+
+@WebServlet("/RoomDetailInfo")
+public class RoomDetailInfoAction extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		request.setCharacterEncoding("utf-8");
+		response.setContentType("text/html; charset=utf-8");
+
+		//사용자가 선택한 회의실 정보
+		String selectedBuilding = request.getParameter("selectedBuilding");
+		//사용자가 선택한 회의실 아이디
+		String roomId = request.getParameter("roomId");
+		//사용자가 선택한 건물명
+		System.out.println(selectedBuilding);
+		//사용자가 선택한 회의실아이디
+		System.out.println(roomId);
+
+		RoomDAO rdao = new RoomDAO();
+		RoomDTO roomDetailInfo = new RoomDTO();
+
+		//사용자가 선택한 건물의 회의실 정보를 roomList에 저장
+		List<RoomDTO> roomList = rdao.selectAll(selectedBuilding);
+		//사용자가 선택한 건물의 회의실 상세정보를 rdto에 저장
+		roomDetailInfo = rdao.selectRoomInfo(roomId);
+		//사용자가 선택한 건물의 회의실 사진 정보를 roomPhotoList에 저장
+		List<RoomPhotoDTO> roomPhotoList = rdao.selectRoomPhoto(roomId);
+		//사용자가 선택한 건물의 회의실 기자재 정보를 roomFixtureList에 저장
+		List<FixtureDTO> roomFixtureList = rdao.selectRoomFixture(roomId);
+
+		request.setAttribute("roomList", roomList);
+		request.setAttribute("roomPhotoList", roomPhotoList);
+		request.setAttribute("roomDetailInfo", roomDetailInfo);
+		request.setAttribute("roomFixtureList", roomFixtureList);
+
+		RequestDispatcher dispatcher = request.getRequestDispatcher("./view/reservation/conferenceDetailInfo.jsp");
+		dispatcher.forward(request, response);
+	}
+}

@@ -1,0 +1,163 @@
+package com.gsitm.dao;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.gsitm.common.ConstString;
+import com.gsitm.dto.RoomPhotoDTO;
+
+
+/**
+ *
+ * @프로그램   : EmployeesDAO.java
+ * @작성일     : 2017. 5. 2.
+ * @작성자     : 지승훈
+ * @기능       : 회의실/예약실 등록에 필요한 사진들 관련 DAO
+ * @버전       : 1.0
+ *
+ */
+
+public class RoomPhotoDAO {
+	public static Connection getConnection() {
+	      Connection conn = null;
+	      try {
+	    	  Class.forName(ConstString.JDBC_DRIVER);
+		      conn = DriverManager.getConnection(ConstString.DB_SERVER, ConstString.DB_USER, ConstString.DB_PASSWD);
+	      } catch (Exception e) {
+	         e.printStackTrace();
+	      }
+	      return conn;
+	   }
+
+	/**
+	 *
+	 * @작성일      : 2017. 5. 2.
+	 * @작성자      : 지승훈
+	 * @기능    	: 회의실/교육실의 사진들을 등록하기위한 메소드
+	 * @메소드명    : insert
+	 * @param roomDTO
+	 */
+	public void insert(RoomPhotoDTO roomPhotoDTO){
+		Connection con = getConnection();
+		PreparedStatement pstmt = null;
+		String photoSql = "insert into room_photos(name,room_id)"
+				        + " values(?,?)";
+		   try {
+			   //room_photos테이블에 데이터 삽입
+			   pstmt = con.prepareStatement(photoSql);
+			   pstmt.setString(1, roomPhotoDTO.getPhotoName());
+			   pstmt.setString(2, roomPhotoDTO.getRoomId());
+			   int result = pstmt.executeUpdate();
+			   System.out.println("photo 삽입 성공");
+		      } catch (SQLException e) {
+		         e.printStackTrace();
+		      } finally {
+		    	  RoomPhotoDAO.close(con, pstmt);;
+		      }
+	}
+
+	/**
+	 *
+	 * @작성일      : 2017. 5. 2.
+	 * @작성자      : 지승훈
+	 * @기능    	: 회의실/교육실의 사진들을 수정하기위한 메소드
+	 * @메소드명    : update
+	 * @param roomDTO
+	 */
+	public void update(RoomPhotoDTO roomPhotoDTO){
+		Connection con = getConnection();
+		PreparedStatement pstmt = null;
+		String updateSql = "insert into room_photos(name,room_id)"
+						 + " values(?,?)";
+		   try {
+
+			   pstmt = con.prepareStatement(updateSql);
+			   pstmt.setString(1, roomPhotoDTO.getPhotoName());
+			   pstmt.setString(2, roomPhotoDTO.getRoomId());
+			   int updateResult = pstmt.executeUpdate();
+			   System.out.println("roomPhoto " + updateResult + " 행 수정하였습니다.");
+		      } catch (SQLException e) {
+		         e.printStackTrace();
+		      } finally {
+		    	  RoomPhotoDAO.close(con, pstmt);;
+		      }
+	}
+
+	/**
+	 *
+	 * @작성일      : 2017. 5. 2.
+	 * @작성자      : 지승훈
+	 * @기능    	: 회의실/교육실의 사진들을 삭제하기위한 메소드
+	 * @메소드명    : delete
+	 * @param num
+	 */
+	public void delete(String roomIdNum){
+		Connection con = getConnection();
+		PreparedStatement pstmt = null;
+		String sql = "delete from room_photos where room_id = ?"; //sql문 작성
+		   try {
+			   pstmt = con.prepareStatement(sql);
+			   pstmt.setString(1, roomIdNum);
+			   int delResult = pstmt.executeUpdate();
+			   System.out.println("roomPhoto " + delResult +" 행 삭제했습니다.");
+
+			   pstmt.executeUpdate();
+		      } catch (SQLException e) {
+		         e.printStackTrace();
+		      } finally {
+		    	  RoomPhotoDAO.close(con, pstmt);;
+		      }
+	}
+
+
+	/**
+	 *
+	 * @작성일      : 2017. 5. 2.
+	 * @작성자      : 지승훈
+	 * @기능    	: 회의실/교육실의 사진들의 리스트를 출력하기 위한 메소드
+	 * @메소드명    : selectAll
+	 * @param num
+	 * @return
+	 */
+	public List<RoomPhotoDTO> selectAll(int num){
+		Connection con = getConnection();
+		PreparedStatement pstmt = null;
+		List<RoomPhotoDTO> RoomPhotoList = new ArrayList<RoomPhotoDTO>();
+		String sql = null; //sql문 작성
+		   try {
+			   pstmt = con.prepareStatement(sql);
+
+			   pstmt.executeQuery();
+		      } catch (SQLException e) {
+		         e.printStackTrace();
+		      } finally {
+		    	  RoomPhotoDAO.close(con, pstmt);
+		      }
+
+		return RoomPhotoList;
+	}
+
+
+	/**
+	 *
+	 * @작성일      : 2017. 5. 2.
+	 * @작성자      : 지승훈
+	 * @기능    	:
+	 * @메소드명    : close
+	 * @param con
+	 * @param pstmt
+	 */
+	private static void close(Connection con, PreparedStatement pstmt) {
+		 try {
+			 pstmt.close();
+			 con.close();
+	      } catch (Exception e) {
+	         e.printStackTrace();
+	      }
+	}
+}

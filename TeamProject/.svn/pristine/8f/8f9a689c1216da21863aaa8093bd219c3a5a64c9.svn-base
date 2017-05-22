@@ -1,0 +1,537 @@
+package com.gsitm.dao;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+import com.gsitm.common.ConstString;
+import com.gsitm.dto.FixtureDTO;
+import com.gsitm.dto.RoomDTO;
+import com.gsitm.dto.RoomPhotoDTO;
+
+/**
+ *
+ * @프로그램   : EmployeesDAO.java
+ * @작성일     : 2017. 5. 2.
+ * @작성자     : 지승훈
+ * @기능       : 회의실/예약실 사용후 결제를 하기위한 부서 관련 DAO
+ * @버전       : 1.0
+ *
+ */
+
+public class RoomDAO {
+	public static Connection getConnection() {
+	      Connection conn = null;
+	      try {
+	    	  Class.forName(ConstString.JDBC_DRIVER);
+		      conn = DriverManager.getConnection(ConstString.DB_SERVER, ConstString.DB_USER, ConstString.DB_PASSWD);
+	      } catch (Exception e) {
+	         e.printStackTrace();
+	      }
+	      return conn;
+	   }
+
+	/**
+	 *
+	 * @작성일      : 2017. 5. 8.
+	 * @작성자      : 지승훈
+	 * @기능    	: 회의실/교육실 등록을 하기위한 함수
+	 * @메소드명    : insert
+	 * @param roomDTO
+	 * @return
+	 */
+	public void insert(RoomDTO roomDTO){
+		Connection con = getConnection();
+		PreparedStatement pstmt = null;
+		String sql = "insert into room(room_id,room_name,position,build_name,fee,room_size,number_of_emp,net_flag,emp_id)"
+				   + " values(?,?,?,?,?,?,?,?,?)";//sql문 작성
+		String roomId = null;
+		   try {
+			   ////Room 테이블에 데이터 삽입
+			   pstmt = con.prepareStatement(sql);
+			   pstmt.setString(1, roomDTO.getRoomId());
+			   pstmt.setString(2, roomDTO.getRoomName());
+			   pstmt.setString(3, roomDTO.getPosition());
+			   pstmt.setString(4, roomDTO.getBuildName());
+			   pstmt.setInt(5, roomDTO.getFee());
+			   pstmt.setString(6, roomDTO.getRoomSize());
+			   pstmt.setInt(7, roomDTO.getNumberOfEmp());
+			   pstmt.setString(8, roomDTO.getNetFlag());
+			   pstmt.setString(9, roomDTO.getEmpId());
+			   int result = pstmt.executeUpdate();
+			   System.out.println("RoomTable insert ? 성공 " + result);
+
+
+		      } catch (SQLException e) {
+		         e.printStackTrace();
+		      } finally {
+		    	  RoomDAO.close(con, pstmt);;
+		      }
+	}
+
+
+	/**
+	 *
+	 * @작성일      : 2017. 5. 8.
+	 * @작성자      : 지승훈
+	 * @기능    	: 회의실/교육실 수정을 하기위해 정보를 보여주기 위한 함수
+	 * @메소드명    : roomInfo
+	 * @param roomDTO
+	 * @param num
+	 */
+	public RoomDTO roomInfo(String roomId){
+		Connection con = getConnection();
+		PreparedStatement pstmt = null;
+		String sql = "select * from room where room_id = ?"; //sql문 작성
+		RoomDTO roomDTO = new RoomDTO();
+		   try {
+			   pstmt = con.prepareStatement(sql);
+			   pstmt.setString(1, roomId);
+			   ResultSet rs = pstmt.executeQuery();
+			   while(rs.next()){
+				   roomDTO.setRoomId(rs.getString("room_id"));
+				   roomDTO.setRoomName(rs.getString("room_name"));
+				   roomDTO.setPosition(rs.getString("position"));
+				   roomDTO.setBuildName(rs.getString("build_name"));
+				   roomDTO.setFee(rs.getInt("fee"));
+				   roomDTO.setRoomSize(rs.getString("room_size"));
+				   roomDTO.setNumberOfEmp(rs.getInt("number_of_emp"));
+				   roomDTO.setNetFlag(rs.getString("net_flag"));
+				   roomDTO.setEmpId(rs.getString("emp_id"));
+			   }
+		      } catch (SQLException e) {
+		         e.printStackTrace();
+		      } finally {
+		    	  RoomDAO.close(con, pstmt);;
+		      }
+		   return roomDTO;
+	}
+
+
+	/**
+	 *
+	 * @작성일      : 2017. 5. 10.
+	 * @작성자      : 지승훈
+	 * @기능    	: 특정 회의실/교육실 수정을 위한 메소드
+	 * @메소드명    : update
+	 * @param roomDTO
+	 */
+	public void update(RoomDTO roomDTO){
+		Connection con = getConnection();
+		PreparedStatement pstmt = null;
+		String sql = "update room set "
+					+ "room_id = ?,"
+					+ "room_name = ?,"
+					+ "position = ?,"
+					+ "build_name = ?,"
+					+ "fee = ?,"
+					+ "room_size = ?,"
+					+ "number_of_emp = ?,"
+					+ "net_flag = ?,"
+					+ "emp_id = ?"
+					+ " where room_id = ?";//sql문 작성
+		   try {
+			   ////Room 테이블에 데이터 수정
+			   pstmt = con.prepareStatement(sql);
+			   pstmt.setString(1, roomDTO.getRoomId());
+			   pstmt.setString(2, roomDTO.getRoomName());
+			   pstmt.setString(3, roomDTO.getPosition());
+			   pstmt.setString(4, roomDTO.getBuildName());
+			   pstmt.setInt(5, roomDTO.getFee());
+			   pstmt.setString(6, roomDTO.getRoomSize());
+			   pstmt.setInt(7, roomDTO.getNumberOfEmp());
+			   pstmt.setString(8, roomDTO.getNetFlag());
+			   pstmt.setString(9, roomDTO.getEmpId());
+			   pstmt.setString(10, roomDTO.getRoomId());
+			   int result = pstmt.executeUpdate();
+			   System.out.println("RoomTable update : 성공 " + result);
+
+		      } catch (SQLException e) {
+		         e.printStackTrace();
+		      } finally {
+		    	  RoomDAO.close(con, pstmt);;
+		      }
+	}
+
+	/**
+	 *
+	 * @작성일      : 2017. 5. 8.
+	 * @작성자      : 지승훈
+	 * @기능    	:회의실/교육실 삭제 하기위한 함수
+	 * @메소드명    : delete
+	 * @param num
+	 */
+	public void delete(int num){
+		Connection con = getConnection();
+		PreparedStatement pstmt = null;
+		String sql = null; //sql문 작성
+		   try {
+			   pstmt = con.prepareStatement(sql);
+
+			   pstmt.executeUpdate();
+		      } catch (SQLException e) {
+		         e.printStackTrace();
+		      } finally {
+		    	  RoomDAO.close(con, pstmt);;
+		      }
+	}
+
+
+	/**
+	 *
+	 * @작성일      : 2017. 5. 8.
+	 * @작성자      : 지승훈
+	 * @기능    	: room 테이블의 전체 개수를 알기위한 function
+	 * @메소드명    : getCount
+	 * @return		: 회의실 및 교육실의 모든 행의 개수를 반환
+	 */
+	public int getCount(){
+		Connection con = getConnection();
+		PreparedStatement pstmt = null;
+		String sql = "select count(*) from room"; //sql문 작성
+		int count = 0;
+		try {
+			PreparedStatement statement = con.prepareStatement(sql);
+			ResultSet rs = statement.executeQuery();
+			if(rs.next()){
+				count = rs.getInt(1);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return count;
+	}
+
+	/**
+	 *
+	 * @작성일      : 2017. 5. 10.
+	 * @작성자      : 지승훈
+	 * @기능    	: 회의실/교육실 페이지 처리를 하기 위한 함수
+	 * @메소드명    : selectAllRoom
+	 * @param intPageNo
+	 * @param rowsPerPage
+	 * @param request
+	 * @return
+	 */
+	//교육실 관리 리스트
+	public List selectAllEduRoom(int intPageNo, int rowsPerPage, HttpServletRequest request){
+		Connection con = getConnection();
+		PreparedStatement pstmt = null;
+		//list에 회의실정보를 담기위해서 생성
+		List<Object> roomList =  (ArrayList<Object>)request.getAttribute("Room");
+		String sql = "select rn,room_id, room_name, position, build_name, fee, room_size, number_of_emp, net_flag, emp_id  from("
+				+ " select rownum rn,room_id, room_name, position, build_name, fee, room_size, number_of_emp, net_flag, emp_id"
+				+ "  from (select * from room where room_id like 'ER%' order by room_id desc) where rownum<=?"
+				+ "   )"
+				+ "where rn>=?";
+		try {
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1,intPageNo*rowsPerPage);
+			pstmt.setInt(2,((intPageNo-1)*rowsPerPage+1));
+			ResultSet rs = pstmt.executeQuery();
+
+
+			while(rs.next()){
+				RoomDTO roomDTO = new RoomDTO();
+				roomDTO.setRoomId(rs.getString("room_id"));
+				roomDTO.setRoomName(rs.getString("room_name"));
+				roomDTO.setPosition(rs.getString("position"));
+				roomDTO.setBuildName(rs.getString("build_name"));
+				roomDTO.setFee(rs.getInt("fee"));
+				roomDTO.setRoomSize(rs.getString("room_size"));
+				roomDTO.setNumberOfEmp(rs.getInt("number_of_emp"));
+				roomDTO.setNetFlag(rs.getString("net_flag"));
+				roomDTO.setEmpId(rs.getString("emp_id"));
+				if(roomList == null){
+					// 만약 session에 Attribute가 없다면 ArrayList를 만들어 받은 Attribtue를 저장.
+					roomList = new ArrayList<Object>();
+					roomList.add(roomDTO);
+				}else{
+					roomList.add(roomDTO);
+				}
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return roomList;
+	}
+	/**
+	 *
+	 * @작성일      : 2017. 5. 10.
+	 * @작성자      : 지승훈
+	 * @기능    	: 등록한 회의실을 조회할수 있는 페이지 처리 함수
+	 * @메소드명    : selectAllConRoom
+	 * @param intPageNo
+	 * @param rowsPerPage
+	 * @param request
+	 * @return
+	 */
+	//회의실 관리 리스트
+		public List selectAllConRoom(int intPageNo, int rowsPerPage, HttpServletRequest request){
+			Connection con = getConnection();
+			PreparedStatement pstmt = null;
+			//list에 회의실정보를 담기위해서 생성
+			List<Object> roomList =  (ArrayList<Object>)request.getAttribute("Room");
+			String sql = "select rn,room_id, room_name, position, build_name, fee, room_size, number_of_emp, net_flag, emp_id  from("
+					+ " select rownum rn,room_id, room_name, position, build_name, fee, room_size, number_of_emp, net_flag, emp_id"
+					+ "  from (select * from room where room_id like 'CR%' order by room_id desc) where rownum<=?"
+					+ "   )"
+					+ "where rn>=?";
+			try {
+				pstmt = con.prepareStatement(sql);
+				pstmt.setInt(1,intPageNo*rowsPerPage);
+				pstmt.setInt(2,((intPageNo-1)*rowsPerPage+1));
+				ResultSet rs = pstmt.executeQuery();
+
+
+				while(rs.next()){
+					RoomDTO roomDTO = new RoomDTO();
+					roomDTO.setRoomId(rs.getString("room_id"));
+					roomDTO.setRoomName(rs.getString("room_name"));
+					roomDTO.setPosition(rs.getString("position"));
+					roomDTO.setBuildName(rs.getString("build_name"));
+					roomDTO.setFee(rs.getInt("fee"));
+					roomDTO.setRoomSize(rs.getString("room_size"));
+					roomDTO.setNumberOfEmp(rs.getInt("number_of_emp"));
+					roomDTO.setNetFlag(rs.getString("net_flag"));
+					roomDTO.setEmpId(rs.getString("emp_id"));
+					if(roomList == null){
+						// 만약 session에 Attribute가 없다면 ArrayList를 만들어 받은 Attribtue를 저장.
+						roomList = new ArrayList<Object>();
+						roomList.add(roomDTO);
+					}else{
+						roomList.add(roomDTO);
+					}
+				}
+
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+
+			return roomList;
+		}
+
+
+	 /**
+	    *
+	    * @작성일  : 2017. 5. 10.
+	    * @작성자  : 지승훈
+	    * @기능    : ROOMID를 생성하는 시퀀스의 다음 값을 가져온다.
+	    * @메소드명 : selectGetNextSequence
+	    * @return - 새로 등록될 예약 ID값
+	    */
+	   public int selectGetNextSequence(){
+
+	      int result = 0;
+	      Connection con = getConnection();
+	      PreparedStatement pstmt = null;
+	      ResultSet rs = null;
+	      String sql = "select SEQ_ROOM.NEXTVAL from dual";
+
+	      try{
+	         pstmt = con.prepareStatement(sql);
+	         rs = pstmt.executeQuery();
+
+	         if(rs.next())
+	            result = rs.getInt(1);
+
+	      } catch (SQLException e) {
+	         e.printStackTrace();
+	      } finally {
+	    	  RoomDAO.close(con, pstmt);
+	      }
+
+	      return result;
+	   }
+
+	/**
+	 *
+	 * @작성일      : 2017. 5. 2.
+	 * @작성자      : 김준호
+	 * @기능    	: 사용자가 선택한 건물의 회의실/교육실 리스트를 출력하기 위한 메소드
+	 * @메소드명    : selectAll
+	 * @param num
+	 * @return
+	 */
+	public List<RoomDTO> selectAll(String buildingName){
+		Connection con = getConnection();
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		//사용자가 선택한 건물의 회의실 정보를 담기 위한 ArrayList 생성
+		List<RoomDTO> roomList = new ArrayList<RoomDTO>();
+		//매개변수로 받은 건물명에 해당하는 회의실 정보를 조회
+		String sql = "select * from ROOM where BUILD_NAME like ?";
+		   try {
+			   pstmt = con.prepareStatement(sql);
+			   //매개변수로 받은 건물명을 sql문에 바인딩
+			   pstmt.setString(1, buildingName);
+			   rs = pstmt.executeQuery();
+			   while (rs.next()) {
+				   	//해당 건물의 회의실 정보를 담기 위한 RoomDTO 객체 생성
+				    RoomDTO rDto = new RoomDTO();
+				    rDto.setRoomId(rs.getString("room_id"));			//회의실_교육실ID
+				    rDto.setRoomName(rs.getString("room_name"));		//회의실 이름
+				    rDto.setPosition(rs.getString("position"));			//회의실 위치
+				    rDto.setBuildName(rs.getString("build_name"));		//건물명
+				    rDto.setFee(rs.getInt("fee"));						//사용요금
+				    rDto.setRoomSize(rs.getString("room_size"));		//회의실 크기
+				    rDto.setNumberOfEmp(rs.getInt("number_of_emp"));	//수용인원
+				    rDto.setNetFlag(rs.getString("net_flag"));			//NW사용여부
+				    rDto.setEmpId(rs.getString("emp_id"));				//직원ID
+				    //회의실 정보를 1개씩 누적
+				    roomList.add(rDto);
+				}
+		      } catch (SQLException e) {
+		         e.printStackTrace();
+		      } finally {
+		    	  RoomDAO.close(con, pstmt);
+		      }
+		//해당 건물의 회의실 정보를 담은 ArrayList 리턴
+		return roomList;
+	}
+	/**
+	 *
+	 * @작성일  : 2017. 5. 5.
+	 * @작성자  : 김준호
+	 * @기능    : 사용자가 선택한 회의실의 사진을 가져오기 위한 메소드
+	 * @메소드명 : selectRoomPhoto
+	 * @param buildingName
+	 * @return
+	 */
+	public List<RoomPhotoDTO> selectRoomPhoto(String roomId){
+		Connection con = getConnection();
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		//사용자가 선택한 건물의 회의실 사진 정보를 담기 위한 ArrayList 생성
+		List<RoomPhotoDTO> roomPhotoList = new ArrayList<RoomPhotoDTO>();
+		//사용자가 선택한 건물의 해당 회의실 사진 정보를 조회
+		String sql = "select * from ROOM inner join ROOM_PHOTOS on ROOM.ROOM_ID = ROOM_PHOTOS.ROOM_ID where ROOM.ROOM_ID = ?";
+		   try {
+			   pstmt = con.prepareStatement(sql);
+			   //매개변수로 받은 건물명을 sql문에 바인딩
+			   pstmt.setString(1, roomId);
+			   rs = pstmt.executeQuery();
+			   while (rs.next()) {
+				    RoomPhotoDTO rpDto = new RoomPhotoDTO();
+				    rpDto.setPhotoName(rs.getString("NAME"));
+				    //회의실 사진 정보를 1개씩 누적
+				    roomPhotoList.add(rpDto);
+				}
+		      } catch (SQLException e) {
+		         e.printStackTrace();
+		      } finally {
+		    	  RoomDAO.close(con, pstmt);
+		      }
+		   System.out.println("roomPhotoList : " + roomPhotoList.size());
+		//사용자가 선택한 건물의 회의실 사진 정보를 담은 ArrayList 리턴
+		return roomPhotoList;
+	}
+	/**
+	 *
+	 * @작성일  : 2017. 5. 6.
+	 * @작성자  : 김준호
+	 * @기능    : 사용자가 선택한 회의실의 기자재 정보를 가져오기 위한 메소드
+	 * @메소드명 : selectRoomFixture
+	 * @param buildingName
+	 * @return
+	 */
+	public List<FixtureDTO> selectRoomFixture(String roomId){
+		Connection con = getConnection();
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		//사용자가 선택한 건물의 회의실 기자재 정보를 담기 위한 ArrayList 생성
+		List<FixtureDTO> roomFixtureList = new ArrayList<FixtureDTO>();
+		//사용자가 선택한 건물의 해당 회의실 기자재 정보를 조회
+		String sql = "select * from ROOM inner join FIXTURE on ROOM.ROOM_ID = FIXTURE.ROOM_ID where ROOM.ROOM_ID = ?";
+		   try {
+			   pstmt = con.prepareStatement(sql);
+			   //매개변수로 받은 건물명을 sql문에 바인딩
+			   pstmt.setString(1, roomId);
+			   rs = pstmt.executeQuery();
+			   while (rs.next()) {
+				    FixtureDTO fDto = new FixtureDTO();
+				    fDto.setName(rs.getString("NAME"));
+				    fDto.setRoomId(rs.getString("ROOM_ID"));
+				    fDto.setPay(rs.getInt("PAY"));
+				    //회의실 기자재 정보를 1개씩 누적
+				    roomFixtureList.add(fDto);
+				}
+		      } catch (SQLException e) {
+		         e.printStackTrace();
+		      } finally {
+		    	  RoomDAO.close(con, pstmt);
+		      }
+		   System.out.println("roomFixtureList : " + roomFixtureList.size());
+		//사용자가 선택한 건물의 회의실 기자재 정보를 담은 ArrayList 리턴
+		return roomFixtureList;
+	}
+	/**
+	 *
+	 * @작성일  : 2017. 5. 6.
+	 * @작성자  : 김준호
+	 * @기능    : 사용자가 선택한 회의실 정보를 가져오기 위한 메소드
+	 * @메소드명 : selectRoomInfo
+	 * @param roomId
+	 * @param buildName
+	 * @return
+	 */
+	public RoomDTO selectRoomInfo(String roomId){
+		Connection con = getConnection();
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		RoomDTO rDto = null;
+
+		//매개변수로 받은 회의실ID에 해당하는 회의실 정보를 조회
+		String sql = "select * from ROOM where ROOM_ID = ?";
+		   try {
+			   pstmt = con.prepareStatement(sql);
+			   //매개변수로 받은 회의실ID를 sql문에 바인딩
+			   pstmt.setString(1, roomId);
+			   rs = pstmt.executeQuery();
+			   while (rs.next()) {
+
+				 //해당 건물의 회의실 정보를 담기 위한 RoomDTO 객체 생성
+				 rDto = new RoomDTO();
+				 rDto.setRoomId(rs.getString("room_id"));			//회의실_교육실ID
+			     rDto.setRoomName(rs.getString("room_name"));		//회의실 이름
+			     rDto.setPosition(rs.getString("position"));		//회의실 위치
+			     rDto.setBuildName(rs.getString("build_name"));		//건물명
+			     rDto.setFee(rs.getInt("fee"));						//사용요금
+			     rDto.setRoomSize(rs.getString("room_size"));		//회의실 크기
+			     rDto.setNumberOfEmp(rs.getInt("number_of_emp"));	//수용인원
+			     rDto.setNetFlag(rs.getString("net_flag"));			//NW사용여부
+			     rDto.setEmpId(rs.getString("emp_id"));				//직원ID
+			   }
+		      } catch (SQLException e) {
+		         e.printStackTrace();
+		      } finally {
+		    	  RoomDAO.close(con, pstmt);
+		      }
+		return rDto;
+	}
+	/**
+	 *
+	 * @작성일      : 2017. 5. 2.
+	 * @작성자      : 지승훈
+	 * @기능    	:
+	 * @메소드명    : close
+	 * @param con
+	 * @param pstmt
+	 */
+	private static void close(Connection con, PreparedStatement pstmt) {
+		 try {
+			 pstmt.close();
+			 con.close();
+	      } catch (Exception e) {
+	         e.printStackTrace();
+	      }
+	}
+}

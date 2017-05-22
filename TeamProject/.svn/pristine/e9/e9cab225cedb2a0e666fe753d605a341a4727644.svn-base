@@ -1,0 +1,89 @@
+package com.gsitm.dao;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+import com.gsitm.dto.PayInfoDTO;
+import com.gsitm.dto.ReservationDTO;
+/**
+ *
+ * @프로그램   : EmployeesDAO.java
+ * @작성일     : 2017. 5. 2.
+ * @작성자     : 지승훈
+ * @기능       : 회의실/예약실 사용후 결제를 하기위한 부서 관련 DAO
+ * @버전       : 1.0
+ *
+ */
+
+public class ReservationDAO {
+	public static Connection getConnection() {
+	      Connection conn = null;
+	      try {
+	         Class.forName("oracle.jdbc.driver.OracleDriver");
+	         conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:myoracle","ora_user","1234");
+	      } catch (Exception e) {
+	         e.printStackTrace();
+	      }
+	      return conn;
+	   }
+
+	/**
+	 *
+	 * @작성일      : 2017. 5. 2.
+	 * @작성자      : 지승훈
+	 * @기능    	: 회의실/교육실 예약 등록 메소드
+	 * @메소드명    : insert
+	 * @param reservationDTO
+	 */
+	public void insert(ReservationDTO reservationDTO){
+		Connection con = getConnection();
+		PreparedStatement pstmt = null;
+		String sql = null; //sql문 작성
+		   try {
+			   pstmt = con.prepareStatement(sql);
+
+			   pstmt.executeUpdate();
+		      } catch (SQLException e) {
+		         e.printStackTrace();
+		      } finally {
+		    	  ReservationDAO.close(con, pstmt);;
+		      }
+	}
+
+	public void update(ReservationDTO reservationDTOm, int num){
+		Connection con = getConnection();
+		PreparedStatement pstmt = null;
+		String sql = null; //sql문 작성
+		   try {
+			   pstmt = con.prepareStatement(sql);
+
+			   pstmt.executeUpdate();
+		      } catch (SQLException e) {
+		         e.printStackTrace();
+		      } finally {
+		    	  ReservationDAO.close(con, pstmt);;
+		      }
+	}
+
+
+
+	/**
+	 *
+	 * @작성일      : 2017. 5. 2.
+	 * @작성자      : 지승훈
+	 * @기능    	:
+	 * @메소드명    : close
+	 * @param con
+	 * @param pstmt
+	 */
+	private static void close(Connection con, PreparedStatement pstmt) {
+		 try {
+			 pstmt.close();
+			 con.close();
+	      } catch (Exception e) {
+	         e.printStackTrace();
+	      }
+	}
+}

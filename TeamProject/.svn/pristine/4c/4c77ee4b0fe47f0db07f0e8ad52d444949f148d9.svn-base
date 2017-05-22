@@ -1,0 +1,107 @@
+<%--
+	author  : 지승훈
+	since   : 2017. 5. 2.
+	version : 1.0
+	subject : 로그인한 회원들의 정보 및 예약한 정보들을 볼수 있는 jsp
+	description :
+--%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="${pageContext.servletContext.contextPath}/resources/js/jquery.min.js"></script>
+		<meta charset="UTF-8">
+		<title>JSP</title>
+		<style>
+			.userInfo{
+				background-color: #D5D5D5;
+			}
+			#userPhoto{
+				border-radius:40px;
+			}
+			table{
+				width: 800px;
+			}
+			.userInfo table tr:nth-child(1) td:nth-child(1){
+				text-align:center;
+			}
+			.userInfo table tr:nth-child(2) td{
+				text-align: center;
+			}
+			.reservation table, .reservation th,.reservation td{
+				border-collapse:collapse;
+				border:1px solid #B1B1B1;
+			}
+			.reservation th{
+				background-color: #D5D5D5;
+				width:80px;
+			}
+		</style>
+	</head>
+	<body>
+	<jsp:include page="/view/common/header.jsp"></jsp:include>
+		<h2>Mypage</h2>
+		<hr/>
+		<section class="userInfo">
+			<table>
+				<tr>
+					<td>
+						<img id="userPhoto" src="http://ehr.gsitm.com/Image/Photo/EmplPic/HR/IT0927.jpg">
+					</td>
+					<td>
+						<ul>
+		 					<li>이름 : ${Employee.empName}</li>
+			 				<li>사번 : ${Employee.empId}</li>
+			 				<li>조직 : ${Employee.authority}</li>
+			 				<li>이메일 : ${Employee.email}</li>
+			 			</ul>
+					</td>
+				</tr>
+				<tr>
+					<td>프로필</td>
+					<td></td>
+				</tr>
+			</table>
+		</section>
+		<section class="reservation">
+			<h2>Mypage</h2>
+			<hr/>
+			<table>
+				<tr>
+					<th>건물명</th>
+					<th>회의실명</th>
+					<th>예약일자</th>
+					<th>이용시간</th>
+					<th>사용팀</th>
+					<th>비용</th>
+					<th>상태표시</th>
+					<th>예약변경</th>
+					<th>예약취소</th>
+				</tr>
+				<tr>
+					<td>제동본사</td>
+					<td>제1 회의실</td>
+					<td>2017.04.04</td>
+					<td>14:00~15:30</td>
+					<td>인사지원실</td>
+					<td>15.000원</td>
+					<td>승인대기</td>
+					<td><button>예약변경</button></td>
+					<td><button>예약취소</button></td>
+				</tr>
+				<tr>
+					<td>제동본사</td>
+					<td>제1 회의실</td>
+					<td>2017.04.04</td>
+					<td>14:00~15:30</td>
+					<td>인사지원실</td>
+					<td>15.000원</td>
+					<td>승인대기</td>
+					<td><button>예약변경</button></td>
+					<td><button>예약취소</button></td>
+				</tr>
+			</table>
+		</section>
+	<jsp:include page="/view/common/footer.jsp"></jsp:include>
+	</body>
+</html>

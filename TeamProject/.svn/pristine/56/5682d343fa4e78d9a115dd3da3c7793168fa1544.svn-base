@@ -1,0 +1,202 @@
+package com.gsitm.dao;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.gsitm.common.ConstString;
+import com.gsitm.dto.ReservationDTO;
+/**
+ *
+ * @프로그램   : EmployeesDAO.java
+ * @작성일     : 2017. 5. 2.
+ * @작성자     : 지승훈
+ * @기능       : 회의실/예약실 사용후 결제를 하기위한 부서 관련 DAO
+ * @버전       : 1.0
+ *
+ */
+
+public class ReservationDAO {
+	public static Connection getConnection() {
+	      Connection conn = null;
+	      try {
+	    	  Class.forName(ConstString.JDBC_DRIVER);
+		      conn = DriverManager.getConnection(ConstString.DB_SERVER, ConstString.DB_USER, ConstString.DB_PASSWD);
+	      } catch (Exception e) {
+	         e.printStackTrace();
+	      }
+	      return conn;
+	   }
+
+	/**
+	 *
+	 * @작성일      : 2017. 5. 2.
+	 * @작성자      : 김태형
+	 * @기능    	: 회의실/교육실 예약 등록 메소드
+	 * @메소드명    : insert
+	 * @param reservationDTO
+	 */
+	public void insert(ReservationDTO reservationDTO){
+
+		Connection con = getConnection();
+		PreparedStatement pstmt = null;
+		String sql = "INSERT INTO reservation "
+				+ "(REG_IN_ID, EMP_ID, ROOM_ID, START_DATE, FINISH_DATE, FEE, USE_COUNT, APPRO_DATE, REG_STATE, USE_STATE, USE_PURPOSE, USE_NETWORK, REG_TERM) "
+				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		
+		try {
+			   int pIdx = 0;
+			   pstmt = con.prepareStatement(sql);
+			   pstmt.setInt(++pIdx, reservationDTO.getRegInId());
+			   pstmt.setString(++pIdx, reservationDTO.getEmpId());
+			   pstmt.setString(++pIdx, reservationDTO.getRoomId());
+			   pstmt.setDate(++pIdx, new java.sql.Date(reservationDTO.getStartDate().getTime()));
+			   pstmt.setDate(++pIdx, new java.sql.Date(reservationDTO.getFinishDate().getTime()));
+			   pstmt.setInt(++pIdx, reservationDTO.getFee());
+			   pstmt.setInt(++pIdx, reservationDTO.getUseCount());
+
+			   if(reservationDTO.getApproDate() != null)
+				   pstmt.setDate(++pIdx, new java.sql.Date(reservationDTO.getApproDate().getTime()));
+			   else
+				   pstmt.setDate(++pIdx, null);
+
+			   pstmt.setString(++pIdx, reservationDTO.getRegState());
+			   pstmt.setString(++pIdx, reservationDTO.getUseState());
+			   pstmt.setString(++pIdx, reservationDTO.getUsePurpose());
+			   pstmt.setString(++pIdx, reservationDTO.getUseNetwork());
+			   pstmt.setString(++pIdx, reservationDTO.getRegTerm());
+
+			   pstmt.executeUpdate();
+			   
+		      } catch (SQLException e) {
+		    	 System.out.println(e.getMessage());
+		         throw new RuntimeException(e);
+		      } finally {
+		    	  ReservationDAO.close(con, pstmt);
+		      }
+	}
+
+	public void update(ReservationDTO reservationDTOm, int num){
+		Connection con = getConnection();
+		PreparedStatement pstmt = null;
+		String sql = null; //sql문 작성
+		   try {
+			   pstmt = con.prepareStatement(sql);
+
+			   pstmt.executeUpdate();
+		      } catch (SQLException e) {
+		         e.printStackTrace();
+		      } finally {
+		    	  ReservationDAO.close(con, pstmt);;
+		      }
+	}
+   /**
+    *
+   * @작성일  : 2017. 5. 8.
+   * @작성자  : 김준호
+   * @기능    : 특정 회의실의 start시각과 finish시각에 예약이 가능한지 조회
+   * @메소드명 : selectAbleReservation
+   * @param roomId - 조회할 회의실 id
+   * @param selectedDate - 조회할 일자
+   * @param start - 예약하고싶은 시작시간
+   * @param finish - 예약하고싶은 종료시간
+   * @return - 예약 가능여부 (가능: true/ 불가: false)
+    */
+   public boolean selectAbleReservation(String roomId, String selectedDate, String start, String finish){
+
+      Connection con = getConnection();
+      PreparedStatement pstmt = null;
+      ResultSet rs = null;
+      int result = 0;
+      //사용자가 조회한 시간에 회의실이 예약되어 있는지 확인
+      String sql = "select count(1) from RESERVATION where ROOM_ID like ? AND "
+            + "((to_date(?, 'yyyy-mm-dd hh24:mi:ss') BETWEEN START_DATE AND FINISH_DATE) "
+            + "OR (to_date(?, 'yyyy-mm-dd hh24:mi:ss') BETWEEN START_DATE AND FINISH_DATE) "
+            + "OR START_DATE BETWEEN to_date(?, 'yyyy-mm-dd hh24:mi:ss') AND to_date(?, 'yyyy-mm-dd hh24:mi:ss') "
+            + "OR FINISH_DATE BETWEEN to_date(?, 'yyyy-mm-dd hh24:mi:ss') AND to_date(?, 'yyyy-mm-dd hh24:mi:ss'))";
+
+      	System.out.println("시작시: " + selectedDate + " "  + start);
+      	System.out.println("종료시: " + selectedDate + " "  + finish);
+         try {
+             pstmt = con.prepareStatement(sql);
+             int idx = 0;
+             pstmt.setString(++idx, roomId); //회의실ID
+             pstmt.setString(++idx, selectedDate + " " + start);  //회의실 사용시작 시간
+             pstmt.setString(++idx, selectedDate + " " + finish); //회의실 사용종료 시간
+             pstmt.setString(++idx, selectedDate + " " + start);
+             pstmt.setString(++idx, selectedDate + " " + finish);
+             pstmt.setString(++idx, selectedDate + " " + start);
+             pstmt.setString(++idx, selectedDate + " " + finish);
+
+             rs = pstmt.executeQuery();
+             if(rs.next()){
+                result = rs.getInt(1);
+             }
+
+            } catch (SQLException e) {
+               e.printStackTrace();
+            } finally {
+               ReservationDAO.close(con, pstmt);
+            }
+
+         if(result == 0)
+            return true;
+         else
+            return false;
+   }
+   
+
+   /**
+    * 
+    * @작성일  : 2017. 5. 10.
+    * @작성자  : 김태형
+    * @기능    : 예약ID를 생성하는 시퀀스의 다음 값을 가져온다.
+    * @메소드명 : selectGetNextSequence
+    * @return - 새로 등록될 예약 ID값
+    */
+   public int selectGetNextSequence(){
+	   
+	   int result = 0;
+	   Connection con = getConnection();
+	   PreparedStatement pstmt = null;
+	   ResultSet rs = null;
+	   String sql = "select SEQ_RESERVATION.NEXTVAL from dual";
+	   
+	   try{
+		   pstmt = con.prepareStatement(sql);
+		   rs = pstmt.executeQuery();
+		   
+		   if(rs.next())
+			   result = rs.getInt(1);
+		   
+	   } catch (SQLException e) {
+		   e.printStackTrace();
+	   } finally {
+		   ReservationDAO.close(con, pstmt);
+	   }
+	   
+	   return result;
+   }
+
+	/**
+	 *
+	 * @작성일      : 2017. 5. 2.
+	 * @작성자      : 지승훈
+	 * @기능    	:
+	 * @메소드명    : close
+	 * @param con
+	 * @param pstmt
+	 */
+	private static void close(Connection con, PreparedStatement pstmt) {
+		 try {
+			 pstmt.close();
+			 con.close();
+	      } catch (Exception e) {
+	         e.printStackTrace();
+	      }
+	}
+}

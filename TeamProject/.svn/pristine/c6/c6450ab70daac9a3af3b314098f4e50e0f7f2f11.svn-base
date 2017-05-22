@@ -1,0 +1,25 @@
+package com.gsitm.common;
+
+/**
+ * @프로그램명 : ConstString.java
+ * @작성일    : 2017. 5. 2.
+ * @작성자    : 김태형
+ * @기능     : 프로젝트에서 사용되는 상수 문자열 정의
+ * @버전     : 1.0
+ *
+ */
+public class ConstString {
+
+	//ojdbc 드라이버 클래스명
+	public static final String JDBC_DRIVER = "oracle.jdbc.driver.OracleDriver";
+
+	//DB서버
+	public static final String DB_SERVER = "jdbc:oracle:thin:@192.168.9.250:1521:gsDB";
+
+	//DB사용자
+	public static final String DB_USER = "java5";
+
+	//DB암호
+	public static final String DB_PASSWD = "java5";
+
+}

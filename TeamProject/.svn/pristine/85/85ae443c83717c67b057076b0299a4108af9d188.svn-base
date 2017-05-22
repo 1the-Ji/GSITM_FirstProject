@@ -1,0 +1,220 @@
+package com.gsitm.dao;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.ResultSet;
+import com.gsitm.common.ConstString;
+import com.gsitm.dto.EmployeesDTO;
+/**
+ *
+ * @프로그램   : EmployeesDAO.java
+ * @작성일     : 2017. 5. 2.
+ * @작성자     : 지승훈
+ * @기능       : 회원정보를 보여주기위한 DAO
+ * @버전       : 1.0
+ *
+ */
+
+public class EmployeesDAO {
+	public static Connection getConnection() {
+	      Connection conn = null;
+	      try {
+	    	  Class.forName(ConstString.JDBC_DRIVER);
+		      conn = DriverManager.getConnection(ConstString.DB_SERVER, ConstString.DB_USER, ConstString.DB_PASSWD);
+	      } catch (Exception e) {
+	         e.printStackTrace();
+	      }
+	      return conn;
+	   }
+
+	/**
+	 *
+	 * @작성일      : 2017. 5. 2.
+	 * @작성자      : 지승훈
+	 * @기능    	: 특정 회원정보를 조회하기 위한 메소드
+	 * @메소드명    : selectEmp
+	 * @param num
+	 * @return
+	 */
+	public EmployeesDTO login(String userId,String userPwd){
+		Connection con = getConnection();
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		EmployeesDTO employeesDTO = new EmployeesDTO();
+		String sql = "select * from employees where emp_id=? and password=?"; //sql문 작성
+		   try {
+			   pstmt = con.prepareStatement(sql);
+			   pstmt.setString(1, userId);
+			   pstmt.setString(2, userPwd);
+			   rs = pstmt.executeQuery();
+			   while(rs.next()){
+				   employeesDTO.setEmpName(rs.getString("emp_name"));
+				   employeesDTO.setEmpId(rs.getString("emp_id"));
+				   employeesDTO.setDepName(rs.getString("dep_name"));
+				   employeesDTO.setDepId(rs.getString("dep_id"));
+				   employeesDTO.setEmail(rs.getString("email"));
+				   employeesDTO.setEmpPhoto(rs.getString("emp_photo"));
+				   employeesDTO.setAuthority(rs.getString("authority"));
+				   employeesDTO.setPassword(rs.getString("password"));
+				   employeesDTO.setPositionName(rs.getString("position_name"));
+				   employeesDTO.setCaptionDepId(rs.getString("captain_dep_id"));
+			   	}
+		      } catch (SQLException e) {
+		    	  new RuntimeException(e);
+		      } finally {
+		    	  EmployeesDAO.close(con, pstmt,rs);
+		      }
+		return employeesDTO;
+	}
+
+	/**
+	 *
+	 * @작성일      : 2017. 5. 2.
+	 * @작성자      : 지승훈
+	 * @기능    	: 특정 회원정보를 조회하기 위한 메소드
+	 * @메소드명    : selectEmp
+	 * @param num
+	 * @return
+	 */
+	public EmployeesDTO login(String userId){
+		Connection con = getConnection();
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		EmployeesDTO employeesDTO = new EmployeesDTO();
+		String sql = "select * from employees where emp_id=?"; //sql문 작성
+		   try {
+			   pstmt = con.prepareStatement(sql);
+			   pstmt.setString(1, userId);
+			   rs = pstmt.executeQuery();
+			   while(rs.next()){
+				   employeesDTO.setEmpName(rs.getString("emp_name"));
+				   employeesDTO.setEmpId(rs.getString("emp_id"));
+				   employeesDTO.setDepName(rs.getString("dep_name"));
+				   employeesDTO.setDepId(rs.getString("dep_id"));
+				   employeesDTO.setEmail(rs.getString("email"));
+				   employeesDTO.setEmpPhoto(rs.getString("emp_photo"));
+				   employeesDTO.setAuthority(rs.getString("authority"));
+				   employeesDTO.setPassword(rs.getString("password"));
+				   employeesDTO.setPositionName("position_name");
+				   employeesDTO.setCaptionDepId("captain_dep_id");
+			   	}
+		      } catch (SQLException e) {
+		    	  new RuntimeException(e);
+		      } finally {
+		    	  EmployeesDAO.close(con, pstmt,rs);
+		      }
+		return employeesDTO;
+	}
+
+	public int userCheck(String userid, String userPwd){
+		int result = -1;
+		String sql = "select password from employees where emp_id=?";
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		try {
+			con = getConnection();
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, userid);
+			rs = pstmt.executeQuery();
+			if (rs.next()) {
+				if (rs.getString("password") != null
+						&& rs.getString("password").equals(userPwd)) {
+					result = 1;
+				} else {
+					result = 0;
+				}
+			} else {
+				result = -1;
+			}
+		} catch (Exception e) {
+			 new RuntimeException(e);
+		} finally {
+			EmployeesDAO.close(con, pstmt,rs);
+		}
+		return result;
+	}
+
+	/**
+	 *
+	 * @작성일  : 2017. 5. 15.
+	 * @작성자  : 김태형
+	 * @기능    : 직원 ID의 부서장 ID를 구한다.
+	 * @메소드명 : selectGetCaptian
+	 * @param empId - 직원 ID
+	 * @return - 부서장 ID
+	 */
+	public String getCaptian(String empId) {
+		String result = "";
+		String sql = "select emp_id from employees where captain_dep_id like (select dep_id from employees where emp_id like ?)";
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		try {
+			con = getConnection();
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, empId);
+			rs = pstmt.executeQuery();
+			if (rs.next()) {
+				result = rs.getString("emp_id");
+			}
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		} finally {
+			EmployeesDAO.close(con, pstmt, rs);
+		}
+		return result;
+	}
+
+	/**
+	 *
+	 * @작성일  : 2017. 5. 15.
+	 * @작성자  : 김태형
+	 * @기능    : 각 권한에 따른 관리자 ID를 가져온다
+	 * @메소드명 : getAdminId
+	 * @param auth - 권한 문자열 (시스템관리자: system / 회의실관리자: conference / 교육실관리자: education)
+	 * @return - 관리자의 emp_id
+	 */
+	public String getAdminId(String auth){
+		String result = "";
+		String sql = "select emp_id from EMPLOYEES where AUTHORITY like ?";
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		try {
+			con = getConnection();
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, auth);
+			rs = pstmt.executeQuery();
+			if (rs.next()) {
+				result = rs.getString("emp_id");
+			}
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		} finally {
+			EmployeesDAO.close(con, pstmt, rs);
+		}
+		return result;
+	}
+
+	/**
+	 *
+	 * @작성일      : 2017. 5. 2.
+	 * @작성자      : 지승훈
+	 * @기능    	:
+	 * @메소드명    : close
+	 * @param con
+	 * @param pstmt
+	 */
+	private static void close(Connection con, PreparedStatement pstmt,ResultSet rs) {
+		 try {
+			 rs.close();
+			 pstmt.close();
+			 con.close();
+	      } catch (Exception e) {
+	         e.printStackTrace();
+	      }
+	}
+}

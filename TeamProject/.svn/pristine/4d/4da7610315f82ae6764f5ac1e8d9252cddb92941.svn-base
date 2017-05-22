@@ -1,0 +1,47 @@
+package com.gsitm.servlet.system;
+
+import java.io.IOException;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import com.gsitm.dao.FixtureDAO;
+import com.gsitm.dao.RoomDAO;
+import com.gsitm.dao.RoomPhotoDAO;
+import com.gsitm.dao.SnackDAO;
+import com.gsitm.dto.EmployeesDTO;
+
+/**
+ * Servlet implementation class ConferenceDeleteAction
+ */
+@WebServlet("/conference/deleteaction")
+public class ConferenceDeleteAction extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String roomId = request.getParameter("roomId");
+		String password = request.getParameter("deletePwd");
+		HttpSession session = request.getSession();
+		EmployeesDTO employDTO = (EmployeesDTO) session.getAttribute("Employee");
+		String employPwd = employDTO.getPassword();
+
+		System.out.println("직원 비밀번호"+employDTO.getPassword());
+		if(password.equals(employPwd)){
+			(new FixtureDAO()).delete(roomId);
+			System.out.println("Fixture삭제 성공");
+			(new SnackDAO()).delete(roomId);
+			System.out.println("Snack삭제 성공");
+			(new RoomPhotoDAO()).delete(roomId);
+			System.out.println("RoomPhoto삭제 성공");
+			(new RoomDAO()).delete(roomId);
+			System.out.println("room삭제 성공");
+		}else{
+			System.out.println("삭제 실패");
+		}
+
+		response.sendRedirect("../conference/manageaction");
+	}
+}

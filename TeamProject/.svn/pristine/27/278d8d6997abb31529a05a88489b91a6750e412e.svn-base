@@ -1,0 +1,99 @@
+package com.gsitm.servlet.sign;
+
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import com.gsitm.dao.ReservationDAO;
+import com.gsitm.dao.RoomDAO;
+import com.gsitm.dto.ReservationDTO;
+import com.gsitm.dto.RoomDTO;
+
+/**
+ * Servlet implementation class SignAction
+ */
+@WebServlet("/sign")
+public class SignAction extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		System.out.println("sign : get()");
+		//로그인 체크
+        if(request.getSession().getAttribute("Employee") == null){
+          response.sendRedirect( request.getContextPath() + "/login");
+          return;
+        }
+        request.setCharacterEncoding("UTF-8");
+        String startDate = (new SimpleDateFormat("yyyy-MM-dd")).format(new Date());
+		String finishDate =  (new SimpleDateFormat("yyyy-MM-dd")).format(new Date());
+        String roomId = request.getParameter("roomDivision");
+        System.out.println("roomId : " + roomId);
+        if(roomId==null || roomId.equals("default")){
+        	roomId = "%%";
+        }else if(roomId.equals("ER")){
+        	roomId = "ER%";
+        }else if(roomId.equals("CR")){
+        	roomId = "CR%";
+        }
+
+        List<ReservationDTO> reservationCrList = (new ReservationDAO()).select(startDate, finishDate, roomId,"결재대기");
+		List<RoomDTO> roomList = new LinkedList<RoomDTO>();
+
+		for(ReservationDTO res : reservationCrList){
+			RoomDTO room = (new RoomDAO()).selectRoomInfo(res.getRoomId());
+			roomList.add(room);
+		}
+
+		HttpSession session = request.getSession();
+
+		request.setAttribute("reservationList",reservationCrList );
+		request.setAttribute("roomList", roomList);
+
+		RequestDispatcher dispatcher = request.getRequestDispatcher("./view/sign/signManage.jsp");
+		dispatcher.forward(request, response);
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		System.out.println("sign : get()");
+
+		 request.setCharacterEncoding("UTF-8");
+	        String startDate = request.getParameter("startDate");
+			String finishDate =  request.getParameter("finishDate");
+	        String roomId = request.getParameter("roomDivision");
+	        System.out.println("buildName : " + roomId);
+	        if(roomId==null || roomId.equals("default")){
+	        	roomId = "%%";
+	        }else if(roomId.equals("ER")){
+	        	roomId = "ER%";
+	        }else if(roomId.equals("CR")){
+	        	roomId = "CR%";
+	        }
+
+	        List<ReservationDTO> reservationCrList = (new ReservationDAO()).select(startDate, finishDate, roomId,"결재대기");
+			List<RoomDTO> roomList = new LinkedList<RoomDTO>();
+
+			for(ReservationDTO res : reservationCrList){
+				RoomDTO room = (new RoomDAO()).selectRoomInfo(res.getRoomId());
+				roomList.add(room);
+			}
+
+			HttpSession session = request.getSession();
+
+			request.setAttribute("reservationList",reservationCrList );
+			request.setAttribute("roomList", roomList);
+
+			RequestDispatcher dispatcher = request.getRequestDispatcher("./view/sign/signManage.jsp");
+			dispatcher.forward(request, response);
+	}
+
+}

@@ -1,0 +1,179 @@
+package com.gsitm.dao;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.gsitm.common.ConstString;
+import com.gsitm.dto.SnackDTO;
+
+
+/**
+ *
+ * @프로그램   : EmployeesDAO.java
+ * @작성일     : 2017. 5. 2.
+ * @작성자     : 지승훈
+ * @기능       : 회의실/교육식의 간식 정보 관련 DAO
+ * @버전       : 1.0
+ *
+ */
+
+public class SnackDAO {
+	public static Connection getConnection() {
+	      Connection conn = null;
+	      try {
+	    	  Class.forName(ConstString.JDBC_DRIVER);
+		      conn = DriverManager.getConnection(ConstString.DB_SERVER, ConstString.DB_USER, ConstString.DB_PASSWD);
+	      } catch (Exception e) {
+	         e.printStackTrace();
+	      }
+	      return conn;
+	   }
+
+	/**
+	 *
+	 * @작성일      : 2017. 5. 2.
+	 * @작성자      : 지승훈
+	 * @기능    	: 회의실/예약실 예약에 필요한 간식 및 비품 등록 메소드
+	 * @메소드명    : insert
+	 * @param roomDTO
+	 */
+	public void insert(SnackDTO snackDTO){
+		Connection con = getConnection();
+		PreparedStatement pstmt = null;
+		String snackSql = "insert into snack(snack_id,name,pay,room_id)"
+						  + " values(SEQ_SNACK.NEXTVAL,?,?,?)";
+		   try {
+				//SNACK테이블에 데이터 삽입
+				pstmt = con.prepareStatement(snackSql);
+				pstmt.setString(1, snackDTO.getName());
+				pstmt.setInt(2, snackDTO.getPay());
+				pstmt.setString(3, snackDTO.getRoomId());
+				int result = pstmt.executeUpdate();
+				System.out.println("snack 삽입 성공");
+		      } catch (SQLException e) {
+		         e.printStackTrace();
+		      } finally {
+		    	  SnackDAO.close(con, pstmt);;
+		      }
+	}
+
+	/**
+	 * @작성일  : 2017. 5. 9.
+	 * @작성자  : 김태형
+	 * @기능    : room_id를 통해 해당 회의실의 간식 목록을 가져옴
+	 * @메소드명 : select
+	 * @param roomId - 조회할 회의실/교육실 room_id
+	 * @return - 해당 회의실/교육실의 제공 가능한 간식 목록
+	 */
+	public List<SnackDTO> select(String roomId){
+
+		Connection con = getConnection();
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+
+		List<SnackDTO> snacks = new ArrayList<SnackDTO>();
+
+		String sql = "select * from snack where room_id like ?";
+		try {
+			pstmt = con.prepareStatement(sql);
+
+			//매개변수 바인딩
+			pstmt.setString(1, roomId);
+			rs = pstmt.executeQuery();
+			while (rs.next()) {
+				SnackDTO snack = new SnackDTO();
+				snack.setSnackId(rs.getInt("snack_id"));
+				snack.setRoomId(rs.getString("room_id"));
+				snack.setName(rs.getString("name"));
+				snack.setPay(rs.getInt("pay"));
+
+				snacks.add(snack); // 리스트에 추가
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			SnackDAO.close(con, pstmt);
+		}
+
+		return snacks;
+	}
+
+
+	/**
+	 *
+	 * @작성일      : 2017. 5. 2.
+	 * @작성자      : 지승훈
+	 * @기능    	: 회의실/교육실의 비치물품 가격 수정 메소드(기존에 있던 기자재 먼저 삭제)
+	 * @메소드명    : update
+	 * @param fixtureDTO
+	 * @param num
+	 */
+
+	public void update(SnackDTO SnackDTO){
+		Connection con = getConnection();
+		PreparedStatement pstmt = null;
+		String updateSql = "insert into snack(snack_id,name,pay,room_id) "
+						 + "values(SEQ_SNACK.NEXTVAL,?,?,?)";
+		   try {
+			   pstmt = con.prepareStatement(updateSql);
+			   pstmt.setString(1, SnackDTO.getName());
+			   pstmt.setInt(2, SnackDTO.getPay());
+			   pstmt.setString(3, SnackDTO.getRoomId());
+			   int updateResult = pstmt.executeUpdate();
+			   System.out.println("Snack " + updateResult + " 행 수정하였습니다.");
+		      } catch (SQLException e) {
+		         e.printStackTrace();
+		      } finally {
+		    	  SnackDAO.close(con, pstmt);;
+		      }
+	}
+
+	/**
+	 *
+	 * @작성일      : 2017. 5. 2.
+	 * @작성자      : 지승훈
+	 * @기능    	: 회의실/예약실 예약에 필요한 간식 및 비품 삭제 메소드
+	 * @메소드명    : update
+	 * @param roomDTO
+	 */
+	public void delete(String roomIdNum){
+		Connection con = getConnection();
+		PreparedStatement pstmt = null;
+		String sql = "delete from snack where room_id = ?"; //sql문 작성
+		   try {
+			   pstmt = con.prepareStatement(sql);
+			   pstmt.setString(1, roomIdNum);
+			   int delResult = pstmt.executeUpdate();
+			   System.out.println("Snack " + delResult +" 행 삭제했습니다.");
+
+			   pstmt.executeUpdate();
+		      } catch (SQLException e) {
+		         e.printStackTrace();
+		      } finally {
+		    	  SnackDAO.close(con, pstmt);;
+		      }
+	}
+
+	/**
+	 *
+	 * @작성일      : 2017. 5. 2.
+	 * @작성자      : 지승훈
+	 * @기능    	:
+	 * @메소드명    : close
+	 * @param con
+	 * @param pstmt
+	 */
+	private static void close(Connection con, PreparedStatement pstmt) {
+		 try {
+			 pstmt.close();
+			 con.close();
+	      } catch (Exception e) {
+	         e.printStackTrace();
+	      }
+	}
+}

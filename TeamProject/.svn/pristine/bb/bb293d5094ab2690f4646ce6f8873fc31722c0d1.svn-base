@@ -1,0 +1,147 @@
+package com.gsitm.servlet.system;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Enumeration;
+import java.util.List;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import com.gsitm.dao.FixtureDAO;
+import com.gsitm.dao.RoomDAO;
+import com.gsitm.dao.RoomPhotoDAO;
+import com.gsitm.dao.SnackDAO;
+import com.gsitm.dto.FixtureDTO;
+import com.gsitm.dto.RoomDTO;
+import com.gsitm.dto.RoomPhotoDTO;
+import com.gsitm.dto.SnackDTO;
+import com.oreilly.servlet.MultipartRequest;
+import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
+
+@WebServlet("/education/updateaction")
+public class EducationUpdateAction extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		System.out.println("education updateaction : get()");
+		HttpSession session = request.getSession();
+		String roomId = request.getParameter("roomId");
+
+		RoomDTO roomDTO = (new RoomDAO()).roomInfo(roomId);
+		List<FixtureDTO> fixtureList = (new FixtureDAO()).select(roomId);
+		List<SnackDTO>  snackList = (new SnackDAO()).select(roomId);
+
+		session.setAttribute("room", roomDTO);
+		session.setAttribute("fixture", fixtureList);
+		session.setAttribute("snack", snackList);
+
+		RequestDispatcher dispatcher = request.getRequestDispatcher("../view/system/educationUpdate.jsp");
+	    dispatcher.forward(request, response);
+	}
+
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		System.out.println("education update action : post");
+		HttpSession session = request.getSession();
+		//인코딩 설정
+	    request.setCharacterEncoding("UTF-8");
+	    String empId= (String) session.getAttribute("login");
+
+	    System.out.println("login : "+session.getAttribute("login"));
+
+	    //교육실 이미지
+  		PrintWriter out = response.getWriter();
+  		String savePath = "resources/image";
+  		int uploadFileSizeLimit = 20 * 1024 * 1024;
+  		String encType = "UTF-8";
+
+  		ServletContext context = getServletContext();
+  		String uploadFilePath = context.getRealPath(savePath);
+
+
+  		MultipartRequest multi = new MultipartRequest(request,
+  			uploadFilePath,										//파일 저장될 위치
+  			uploadFileSizeLimit,								//업로드 파일 크기제한
+  			encType,											//파일 형식
+  			new DefaultFileRenamePolicy()
+  		);
+  		String roomIdNum = multi.getParameter("roomId");
+
+  		RoomDTO roomDTO = new RoomDTO();
+		roomDTO.setRoomId(roomIdNum);
+		System.out.println("roomIdNum : " + roomIdNum);
+		roomDTO.setRoomName(multi.getParameter("roomName"));
+		System.out.println("roomName : " + roomDTO.getRoomName());
+		roomDTO.setPosition(multi.getParameter("position"));
+		System.out.println("position :" + roomDTO.getPosition());
+		roomDTO.setBuildName(multi.getParameter("buildName"));
+		System.out.println("buildName : " + roomDTO.getBuildName());
+		roomDTO.setRoomSize(multi.getParameter("roomSize"));
+		System.out.println("roomSize : " + roomDTO.getRoomSize());
+		roomDTO.setNetFlag(multi.getParameter("netFlag"));
+		System.out.println("netFlag : " + roomDTO.getNetFlag());
+		roomDTO.setFee(Integer.parseInt(multi.getParameter("fee")));
+		System.out.println("fee : " + roomDTO.getFee());
+		roomDTO.setNumberOfEmp(Integer.parseInt(multi.getParameter("numberOfEmp")));
+		System.out.println("numberOfEmp : " + roomDTO.getNumberOfEmp());
+		roomDTO.setEmpId(empId);
+		System.out.println("empId : " + empId);
+
+		(new RoomDAO()).update(roomDTO);
+
+		//비치물품 저장
+		String[] fixtureName = multi.getParameterValues("fixtureName");
+		System.out.println("fixtureNameLength : " +fixtureName.length);
+		String[] pay = multi.getParameterValues("fixturePay");
+		System.out.println("payLength : " + pay.length);
+		FixtureDTO fixtureDTO = new FixtureDTO();
+		(new FixtureDAO()).delete(roomIdNum);
+		for(int i=0; i<fixtureName.length; i++){
+			fixtureDTO.setRoomId(roomIdNum);
+			fixtureDTO.setName(fixtureName[i]);
+			System.out.println("fixtureName : " + fixtureDTO.getName());
+			fixtureDTO.setPay(Integer.parseInt(pay[i]));
+			System.out.println("fixturePay : " + fixtureDTO.getPay());
+			(new FixtureDAO()).insert(fixtureDTO);
+		}
+
+		//간식 저장
+		String[] snackName = multi.getParameterValues("snackName");
+		String[] snackPay = multi.getParameterValues("snackPay");
+		SnackDTO snackDTO = new SnackDTO();
+		(new SnackDAO()).delete(roomIdNum);
+		for(int i=0; i<snackName.length; i++){
+			snackDTO.setRoomId(roomIdNum);
+			snackDTO.setName(snackName[i]);
+			System.out.println("snackName : " + snackDTO.getName());
+			snackDTO.setPay(Integer.parseInt(snackPay[i]));
+			System.out.println("snackPay : " + snackDTO.getPay());
+			(new SnackDAO()).insert(snackDTO);
+		}
+
+		Enumeration files = multi.getFileNames();
+		RoomPhotoDTO roomPhotoDTO = new RoomPhotoDTO();
+		(new RoomPhotoDAO()).delete(roomIdNum);
+		while(files.hasMoreElements()){
+			String file = (String)files.nextElement();
+			String file_name = multi.getFilesystemName(file);
+			roomPhotoDTO.setPhotoName(file_name);
+			roomPhotoDTO.setRoomId(roomIdNum);
+			System.out.println("file_name : " + roomPhotoDTO.getPhotoName());
+
+			(new RoomPhotoDAO()).insert(roomPhotoDTO);
+		}
+		response.setContentType("text/html;charset=UTF-8");
+
+		response.sendRedirect("../education/manageaction");
+	}
+
+}

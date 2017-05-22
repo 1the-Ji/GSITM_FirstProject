@@ -1,0 +1,134 @@
+package com.gsitm.dao;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import com.gsitm.common.ConstString;
+import com.gsitm.dto.FixtureDTO;
+
+/**
+ *
+ * @프로그램   : EmployeesDAO.java
+ * @작성일     : 2017. 5. 2.
+ * @작성자     : 지승훈
+ * @기능       : 회의실/교육실의 비치물품 가격 관련 DAO
+ * @버전       : 1.0
+ *
+ */
+
+public class FixtureDAO {
+	public static Connection getConnection() {
+	      Connection conn = null;
+	      try {
+	    	  Class.forName(ConstString.JDBC_DRIVER);
+	    	  conn = DriverManager.getConnection(ConstString.DB_SERVER, ConstString.DB_USER, ConstString.DB_PASSWD);
+	      } catch (Exception e) {
+	         e.printStackTrace();
+	      }
+	      return conn;
+	   }
+
+	/**
+	 *
+	 * @작성일      : 2017. 5. 2.
+	 * @작성자      : 지승훈
+	 * @기능    	: 회의실/교육실의 비치물품 가격 등록 메소드
+	 * @메소드명    : insert
+	 * @param roomDTO
+	 */
+	public void insert(FixtureDTO fixtureDTO){
+		Connection con = getConnection();
+		PreparedStatement pstmt = null;
+		//String sql = "select room_seq.currval from dual"; //sql문 작성
+		String fixtureSql = "insert into fixture(fixture_id,name,pay,room_id)"
+						  + " values(SEQ_FIXTURE.NEXTVAL,?,?,?)";
+		//String roomId = null;
+		   try {
+			   /*//현재 회의실을 등록하고자 하는 RoomId값 가져오기
+			   pstmt = con.prepareStatement(sql);
+			   ResultSet rs = pstmt.executeQuery();
+				while(rs.next()){
+					roomId = rs.getString("room_seq.currval");
+				}*/
+				//FIXTURE테이블에 데이터 삽입
+				pstmt = con.prepareStatement(fixtureSql);
+				pstmt.setString(1, fixtureDTO.getName());
+				pstmt.setInt(2, fixtureDTO.getPay());
+				pstmt.setString(3, fixtureDTO.getRoomId());
+				int result = pstmt.executeUpdate();
+				System.out.println("fixture 삽입 성공");
+		      } catch (SQLException e) {
+		         e.printStackTrace();
+		      } finally {
+		    	  FixtureDAO.close(con, pstmt);;
+		      }
+	}
+	/**
+	 *
+	 * @작성일      : 2017. 5. 2.
+	 * @작성자      : 지승훈
+	 * @기능    	: 회의실/교육실의 비치물품 가격 수정 메소드
+	 * @메소드명    : update
+	 * @param fixtureDTO
+	 * @param num
+	 */
+
+	public void update(FixtureDTO fixtureDTO,int num){
+		Connection con = getConnection();
+		PreparedStatement pstmt = null;
+		String sql = null; //sql문 작성
+		   try {
+			   pstmt = con.prepareStatement(sql);
+
+			   pstmt.executeUpdate();
+		      } catch (SQLException e) {
+		         e.printStackTrace();
+		      } finally {
+		    	  FixtureDAO.close(con, pstmt);;
+		      }
+	}
+
+	/**
+	 *
+	 * @작성일      : 2017. 5. 2.
+	 * @작성자      : 지승훈
+	 * @기능    	: 회의실/교육실의 비치물품 가격 삭제 메소드
+	 * @메소드명    : update
+	 * @param roomDTO
+	 */
+	public void delete(int num){
+		Connection con = getConnection();
+		PreparedStatement pstmt = null;
+		String sql = null; //sql문 작성
+		   try {
+			   pstmt = con.prepareStatement(sql);
+
+			   pstmt.executeUpdate();
+		      } catch (SQLException e) {
+		         e.printStackTrace();
+		      } finally {
+		    	  FixtureDAO.close(con, pstmt);;
+		      }
+	}
+
+	/**
+	 *
+	 * @작성일      : 2017. 5. 2.
+	 * @작성자      : 지승훈
+	 * @기능    	:
+	 * @메소드명    : close
+	 * @param con
+	 * @param pstmt
+	 */
+	private static void close(Connection con, PreparedStatement pstmt) {
+		 try {
+			 pstmt.close();
+			 con.close();
+	      } catch (Exception e) {
+	         e.printStackTrace();
+	      }
+	}
+}

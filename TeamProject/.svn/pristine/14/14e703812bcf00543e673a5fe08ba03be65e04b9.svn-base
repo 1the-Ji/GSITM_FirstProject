@@ -1,0 +1,26 @@
+package com.gsitm.dto;
+
+public class SnackDTO {
+	private int snackId;
+	private String snackName;
+	private String roomId;
+
+	public int getSnackId() {
+		return snackId;
+	}
+	public void setSnackId(int snackId) {
+		this.snackId = snackId;
+	}
+	public String getSnackName() {
+		return snackName;
+	}
+	public void setSnackName(String snackName) {
+		this.snackName = snackName;
+	}
+	public String getRoomId() {
+		return roomId;
+	}
+	public void setRoomId(String roomId) {
+		this.roomId = roomId;
+	}
+}

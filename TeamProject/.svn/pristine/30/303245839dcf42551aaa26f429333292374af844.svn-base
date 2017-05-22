@@ -1,0 +1,26 @@
+package com.gsitm.dto;
+
+public class UseDepOfRoomDTO {
+	private int useDepOfRoomId;
+	private int regInId;
+	private int depId;
+
+	public int getUseDepOfRoomId() {
+		return useDepOfRoomId;
+	}
+	public void setUseDepOfRoomId(int useDepOfRoomId) {
+		this.useDepOfRoomId = useDepOfRoomId;
+	}
+	public int getRegInId() {
+		return regInId;
+	}
+	public void setRegInId(int regInId) {
+		this.regInId = regInId;
+	}
+	public int getDepId() {
+		return depId;
+	}
+	public void setDepId(int depId) {
+		this.depId = depId;
+	}
+}

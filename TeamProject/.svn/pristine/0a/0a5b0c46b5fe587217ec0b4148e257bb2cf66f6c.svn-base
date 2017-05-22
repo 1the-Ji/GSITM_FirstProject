@@ -1,0 +1,72 @@
+package com.gsitm.dao;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.gsitm.common.ConstString;
+import com.gsitm.dto.DepartmentsDTO;
+
+public class ProvisioningDAO {
+
+	public static Connection getConnection() {
+		Connection conn = null;
+		try {
+			Class.forName(ConstString.JDBC_DRIVER);
+			conn = DriverManager.getConnection(ConstString.DB_SERVER, ConstString.DB_USER, ConstString.DB_PASSWD);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return conn;
+	}
+	/**
+	 *
+	 * @작성일  : 2017. 5. 10.
+	 * @작성자  : 김준호
+	 * @기능    : 조직도 정보를 가져오는 메소드
+	 * @메소드명 : selectAll
+	 * @param buildingName
+	 * @return
+	 */
+	public List<DepartmentsDTO> selectDepartments(){
+		Connection con = getConnection();
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		//사용자가 선택한 건물의 회의실 정보를 담기 위한 ArrayList 생성
+		List<DepartmentsDTO> departmentsList = new ArrayList<DepartmentsDTO>();
+		//매개변수로 받은 건물명에 해당하는 회의실 정보를 조회
+		String sql = "select * from DEPARTMENTS";
+		   try {
+			   pstmt = con.prepareStatement(sql);
+			   //매개변수로 받은 건물명을 sql문에 바인딩
+			   rs = pstmt.executeQuery();
+			   while (rs.next()) {
+				    System.out.println("디비들어옴");
+				    DepartmentsDTO dDto = new DepartmentsDTO();
+				    dDto.setDepId(rs.getString("DEP_ID"));
+				    dDto.setDepName(rs.getString("DEP_NAME"));
+				    departmentsList.add(dDto);
+				}
+		      } catch (SQLException e) {
+		         e.printStackTrace();
+		      } finally {
+		    	  ProvisioningDAO.close(con, pstmt);
+		      }
+		//해당 건물의 회의실 정보를 담은 ArrayList 리턴
+		System.out.println("departmentsList" + departmentsList);
+		return departmentsList;
+	}
+
+	private static void close(Connection con, PreparedStatement pstmt) {
+		 try {
+			 pstmt.close();
+			 con.close();
+	      } catch (Exception e) {
+	         e.printStackTrace();
+	      }
+	}
+}

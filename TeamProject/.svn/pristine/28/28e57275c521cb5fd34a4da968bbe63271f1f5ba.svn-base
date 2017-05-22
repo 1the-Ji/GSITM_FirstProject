@@ -1,0 +1,41 @@
+package com.gsitm.dto;
+/**
+ *
+ * @프로그램   : SnackDTO.java
+ * @작성일     : 2017. 5. 4.
+ * @작성자     : 지승훈
+ * @기능       : 회의실/교육실의 간식 테이블을 위한 DTO
+ * @버전       : 1.0
+ *
+ */
+public class SnackDTO {
+	private int snackId;		//간식 ID
+	private String name;	//간식 이름
+	private String roomId;		//예약 ID
+	private int pay;			//간식 비용
+
+	public int getSnackId() {
+		return snackId;
+	}
+	public void setSnackId(int snackId) {
+		this.snackId = snackId;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String Name) {
+		this.name = Name;
+	}
+	public String getRoomId() {
+		return roomId;
+	}
+	public void setRoomId(String roomId) {
+		this.roomId = roomId;
+	}
+	public int getPay() {
+		return pay;
+	}
+	public void setPay(int pay) {
+		this.pay = pay;
+	}
+}

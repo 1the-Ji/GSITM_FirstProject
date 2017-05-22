@@ -1,0 +1,31 @@
+package com.gsitm.common;
+
+/**
+ * @프로그램명 : ConstString.java
+ * @작성일    : 2017. 5. 2.
+ * @작성자    : 김태형
+ * @기능     : 프로젝트에서 사용되는 상수 문자열 정의
+ * @버전     : 1.0
+ *
+ */
+public class ConstString {
+
+	//ojdbc 드라이버 클래스명
+	public static final String JDBC_DRIVER = "oracle.jdbc.driver.OracleDriver";
+
+	//DB서버
+	public static final String DB_SERVER = "jdbc:oracle:thin:@192.168.9.250:1521:gsDB";
+	//public static final String DB_SERVER = "jdbc:oracle:thin:@localhost:1521:myoracle";
+	//DB사용자
+	public static final String DB_USER = "java5";
+	//public static final String DB_USER = "ora_user";
+	//DB암호
+	public static final String DB_PASSWD = "java5";
+	//public static final String DB_PASSWD = "1234";
+
+	//서버 URL루트경로 (이메일 생성 시 폼 생성 요청주소에 사용)
+	public static String SERVER_ROOT_URL = "http://localhost:8181/TeamProject";
+
+	// 메일 테스트모드 (true인 경우 실제 메일은 발송되지않고 로그만 찍음)
+	public static final boolean DISABLE_MAIL_SEND = false;
+}

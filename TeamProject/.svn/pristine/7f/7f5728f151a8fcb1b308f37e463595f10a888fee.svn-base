@@ -1,0 +1,64 @@
+package com.gsitm.servlet.approval;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.google.gson.Gson;
+import com.gsitm.dao.ReservationDAO;
+import com.gsitm.dto.ReservationDTO;
+
+@WebServlet("/conference/approval/info")
+public class ConferenceApprovalInfoAction extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		System.out.println("conference approval Info----- : get()");
+
+		int regInId = Integer.parseInt(request.getParameter("regInId"));
+		System.out.println("aaa : " + regInId);
+		ReservationDTO reservationDTO = (new ReservationDAO()).selectById(regInId);
+		//DTO 클래스를 정의(여러개)
+
+		Map<String,Object> map = new HashMap();
+
+		map.put("reservationDTO", reservationDTO);
+
+		Gson gson = new Gson();
+
+		 //옵션- 캐쉬 사용안하기
+        response.setHeader("Pragma","no-cache");
+        response.setHeader("Cache-Control","no-cache");
+        response.addHeader("Cache-Control","no-store");
+        response.setDateHeader("Expires",0);
+
+        response.setContentType("text/xml;charset=UTF-8");
+
+        PrintWriter writer = response.getWriter();
+
+        String outString="";
+        if(reservationDTO!=null){
+            outString = gson.toJson(map);    //객체의 데이터를 JSON형태의 문자열로 변환
+            System.out.println(outString);  //콘솔에 출력
+        }else{
+            outString = "404";
+        }
+
+        writer.println(outString); //요청한 브라우저에 응답
+
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		System.out.println("conference approval info: post()");
+
+
+	}
+
+}

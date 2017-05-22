@@ -1,0 +1,74 @@
+package com.gsitm.conferenceinfo;
+
+
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.gsitm.dao.ReservationDAO;
+import com.gsitm.dao.RoomDAO;
+import com.gsitm.dto.ReservationDTO;
+import com.gsitm.dto.RoomDTO;
+
+/**
+ * Servlet implementation class ConferenceInfoAction
+ */
+@WebServlet("/conferenceinfo")
+public class ConferenceInfoAction extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		//최초 서블릿 요청시 회의실 조회 페이지로 이동
+		RequestDispatcher dispatcher = request.getRequestDispatcher("./view/reservation/conferenceInfo.jsp");
+		dispatcher.forward(request, response);
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		request.setCharacterEncoding("utf-8");
+		response.setContentType("text/html; charset=utf-8");
+
+		String selectedDate = request.getParameter("selectedDate"); //선택한 날짜
+		String start = request.getParameter("startHour"); //선택한 사용시작 시간
+		String finish = request.getParameter("finishHour"); //선택한 사용종료 시간
+		String selectedBuilding = request.getParameter("selectedBuilding"); //건물명
+		//파라미터로 받은 년/월/일과 시간을 1개의 문자열로 합침
+		String startHour = selectedDate + " " + start;
+		String finishHour = selectedDate + " " + finish;
+		RoomDAO roomDao = new RoomDAO();
+		ReservationDAO reservationDao = new ReservationDAO(); //(2017-05-07)
+		//사용자가 선택한 건물의 회의실 정보를 roomList에 저장
+		List<RoomDTO> roomList = roomDao.selectAll(selectedBuilding);
+		String[] resAbleStr = new String[roomList.size()];
+
+		for(int i=0; i < roomList.size(); i++){
+			boolean b = reservationDao.selectAbleReservation(roomList.get(i).getRoomId(), selectedDate, start, finish);
+			if(b == true)
+				resAbleStr[i] = "예약가능";
+			else
+				resAbleStr[i] = "예약불가";
+		}
+
+		//사용자가 선택한 건물, 선택한 시간에 예약가능한 회의실을 조회(2017-05-07)
+		//List<ReservationDTO> reservationRoomList = reservationDao.selectReservation(selectedBuilding, startHour, finishHour);
+
+		//상세정보를 출력하기 위해 건물명을 파라미터로 다시 넘김
+		request.setAttribute("selectedBuilding", selectedBuilding);
+		request.setAttribute("roomList", roomList);
+		//request.setAttribute("reservationRoomList", reservationRoomList); //(2017-05-07)
+		request.setAttribute("resAbleStr", resAbleStr);
+
+		//해당 건물의 회의실 정보를 담은 ArrayList인 roomList를 회의실 조회 페이지로 전달
+		RequestDispatcher dispatcher = request.getRequestDispatcher("./view/reservation/conferenceInfo.jsp");
+		dispatcher.forward(request, response);
+
+	}
+}

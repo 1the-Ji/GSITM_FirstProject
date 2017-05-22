@@ -1,0 +1,34 @@
+package com.gsitm.dto;
+
+public class RegOptionDTO {
+	private int snackId;
+	private int snackCount;
+	private int regInId;
+	private int fixtureId;
+	public int getSnackId() {
+		return snackId;
+	}
+	public void setSnackId(int snackId) {
+		this.snackId = snackId;
+	}
+	public int getSnackCount() {
+		return snackCount;
+	}
+	public void setSnackCount(int snackCount) {
+		this.snackCount = snackCount;
+	}
+	public int getRegInId() {
+		return regInId;
+	}
+	public void setRegInId(int regInId) {
+		this.regInId = regInId;
+	}
+	public int getFixtureId() {
+		return fixtureId;
+	}
+	public void setFixtureId(int fixtureId) {
+		this.fixtureId = fixtureId;
+	}
+
+
+}

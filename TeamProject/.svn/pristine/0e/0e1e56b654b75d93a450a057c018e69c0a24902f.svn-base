@@ -1,0 +1,81 @@
+package com.gsitm.servlet;
+
+import java.io.IOException;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.websocket.Session;
+
+import com.gsitm.dao.EmployeesDAO;
+import com.gsitm.dto.EmployeesDTO;
+
+import sun.security.jca.GetInstance.Instance;
+
+/**
+ * Servlet implementation class LoginServlet
+ */
+@WebServlet("/login")
+public class LoginAction extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+	EmployeesDAO employeesDAO = new EmployeesDAO();
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		System.out.println("loginAction : get()");
+		HttpSession session = request.getSession();
+		session.invalidate();
+		RequestDispatcher dispatcher = request.getRequestDispatcher("./view/login/login.jsp");
+	      dispatcher.forward(request, response);
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		System.out.println("loginAction : post()");
+		HttpSession session = request.getSession();
+		String url = "./view/login/login.jsp";
+		String userId = request.getParameter("userId");
+		String userPwd = request.getParameter("userPwd");
+
+		EmployeesDTO employDTO = employeesDAO.login(userId, userPwd) ;
+		String authority = employDTO.getAuthority();
+		System.out.println("권한 : " + authority);
+
+		int result = employeesDAO.userCheck(userId, userPwd);
+
+		//로그인 체크
+		if(result == 1){
+			System.out.println("로그인 성공!!");
+			session.setAttribute("Employee", employDTO);
+			session.setAttribute("login", employDTO.getEmpId());
+			session.setAttribute("Authority",employDTO.getAuthority());
+			//권한에 따라서 페이지 다르게 처리
+			if(authority == null || authority.trim().length()==0){
+				System.out.println("예약자 로그인");
+				url = "./ReservationGuidanceAction";
+			}else{
+				if(authority.equals("system")){
+					System.out.println("시스템 관리자 로그인");
+					url = "./conference/manageaction";
+				}else if(authority.equals("conference")){
+					System.out.println("승인 관리자 로그인");
+					url = "./conference/manageaction";
+				}
+			}
+		}else if(result==0){
+			System.out.println("비밀번호 오류");
+			request.setAttribute("message", "비밀번호가 맞지 않습니다.");
+			RequestDispatcher dispatcher = request.getRequestDispatcher(url);
+		     dispatcher.forward(request, response);
+		}else if(result==-1){
+			System.out.println("존재하지 않은 회원 오류");
+			request.setAttribute("message", "존재하지 않는 회원입니다.");
+			RequestDispatcher dispatcher = request.getRequestDispatcher(url);
+		    dispatcher.forward(request, response);
+		}
+		response.sendRedirect(url);
+	}
+
+}

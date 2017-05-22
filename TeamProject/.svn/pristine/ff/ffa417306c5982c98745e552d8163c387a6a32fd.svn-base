@@ -1,0 +1,117 @@
+<!--
+author  : 김준호
+since   : 2017. 4. 19.
+version : 1.0
+subject : 회의실 조회 페이지
+description :
+-->
+<!--
+author  : 김준호
+since   : 2017. 4. 19.
+version : 1.0
+subject : 
+description :
+ -  
+-->
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<html>
+<head>
+<style>
+/* body {
+	margin: 0;
+}
+
+.navbar {
+	position: fixed;
+	width: 100%;
+}
+
+.navbar>ul {
+	background: #0A6EFF;
+	margin: 0;
+	padding: 0;
+}
+
+.navbar>ul>li {
+	display: inline-block;
+	vertical-align: middle;
+	padding: 0;
+}
+
+.navbar>ul>li>a {
+	text-decoration: none;
+	padding: 10px 80px;
+	color: white;
+}
+
+.navbar>ul>li>a:hover {
+	background: #2828CD;
+}
+
+.navbar>ul>li>img {
+	vertical-align: middle;
+} */
+body {
+	margin: 0;
+}
+
+.navbar {
+	position: fixed;
+	display: inline-block;
+	width: 100%;
+	background: #0A6EFF;
+}
+
+.navbar>div {
+	float: right;
+}
+
+.navbar>ul {
+	float: left;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.navbar>ul>li {
+	display: inline-block;
+	padding: 0;
+}
+
+.navbar a {
+	display: block;
+	text-decoration: none;
+	padding: 10px 70px;
+	color: white;
+}
+
+.navbar a:hover {
+	background: #2828CD;
+}
+</style>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<html>
+<body>
+	<nav class="navbar">
+		<ul>
+			<li><a href="#">홈</a></li>
+			<li><a href="#">예약안내</a></li>
+			<li><a href="#">회의실예약</a></li>
+			<li><a href="#">교육실예약</a></li>
+		</ul>
+		<div>
+			<a href="#">logout</a>
+		</div>
+		<div>
+			<a href="#">Mypage</a>
+		</div>
+	</nav>
+	
+</body>
+</html>
+</body>
+</html>
